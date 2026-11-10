@@ -232,9 +232,20 @@
       volcanoes: biome === 'lava' ? 0.55 + r() * 0.45 : r() < 0.2 ? r() * 0.5 : 0,
       iceCaps: biome === 'ice' ? 0.8 + r() * 0.2 : biome === 'lava' || biome === 'storm' ? r() * 0.15 : 0.2 + r() * 0.55,
       glow: biome === 'lava' ? 0.4 + r() * 0.5 : r() * 0.4,
-      rings: rings, moons: moons, shape: null, paint: '',
+      rings: rings, moons: moons, shape: null, shapeKind: null, paint: '',
       name: '', author: '', msg: ''
     };
+  };
+
+  T.blankSpec = function (seed) {
+    seed = (seed >>> 0) || 1;
+    return T.cleanSpec({
+      seed: seed, size: 0.5, biome: 'slate', land: 1,
+      clouds: 0, cloudPat: 'wispy', atmo: 0, atmoHue: 0.55,
+      aurora: 0, city: 0, craters: 0, volcanoes: 0, iceCaps: 0, glow: 0,
+      rings: [], moons: [], shape: null, shapeKind: null, paint: '',
+      name: '', author: '', msg: ''
+    });
   };
 
   function num(v, a, b, d) { v = +v; return isFinite(v) ? T.clamp(v, a, b) : d; }
@@ -255,7 +266,8 @@
   T.cleanSpec = function (s) {
     s = s || {};
     var d = T.defaultSpec((s.seed >>> 0) || 1), i, biome = str(s.biome, 12);
-    if (T.BIOMES.indexOf(biome) < 0) biome = d.biome;
+    var slate = biome === 'slate';
+    if (!slate && T.BIOMES.indexOf(biome) < 0) biome = d.biome;
     var pat = str(s.cloudPat, 12); if (T.CLOUD_PATS.indexOf(pat) < 0) pat = d.cloudPat;
     var moons = [], rings = [];
     if (Array.isArray(s.moons)) { for (i = 0; i < s.moons.length && i < 3; i++) moons.push(T.cleanMoon(s.moons[i], d.seed, i)); }
@@ -264,14 +276,18 @@
     else if (s.rings) rings.push(T.defaultRing(d.seed, 0));
     var shape = null;
     if (typeof s.shape === 'string' && s.shape.length > 8 && s.shape.length < 4000) shape = s.shape.replace(/[^A-Za-z0-9+/=]/g, '').slice(0, 2000);
+    var kind = str(s.shapeKind, 12);
+    if (['heart', 'pear', 'bean', 'diamond'].indexOf(kind) < 0) kind = null;
+    var landD = slate ? 1 : d.land, cloudD = slate ? 0 : d.clouds, atmoD = slate ? 0 : d.atmo;
+    var craterD = slate ? 0 : d.craters, iceD = slate ? 0 : d.iceCaps, sizeD = slate ? 0.5 : d.size;
     return {
-      seed: d.seed, size: num(s.size, 0, 1, d.size), biome: biome, land: num(s.land, 0, 1, d.land),
-      clouds: num(s.clouds, 0, 1, d.clouds), cloudPat: pat,
-      atmo: num(s.atmo, 0, 1, d.atmo), atmoHue: num(s.atmoHue, 0, 1, d.atmoHue),
+      seed: d.seed, size: num(s.size, 0, 1, sizeD), biome: biome, land: num(s.land, 0, 1, landD),
+      clouds: num(s.clouds, 0, 1, cloudD), cloudPat: pat,
+      atmo: num(s.atmo, 0, 1, atmoD), atmoHue: num(s.atmoHue, 0, 1, slate ? 0.55 : d.atmoHue),
       aurora: num(s.aurora, 0, 1, 0), city: num(s.city, 0, 1, 0),
-      craters: num(s.craters, 0, 1, d.craters), volcanoes: num(s.volcanoes, 0, 1, 0),
-      iceCaps: num(s.iceCaps, 0, 1, d.iceCaps), glow: num(s.glow, 0, 1, 0),
-      rings: rings, moons: moons, shape: shape,
+      craters: num(s.craters, 0, 1, craterD), volcanoes: num(s.volcanoes, 0, 1, 0),
+      iceCaps: num(s.iceCaps, 0, 1, iceD), glow: num(s.glow, 0, 1, 0),
+      rings: rings, moons: moons, shape: shape, shapeKind: kind,
       paint: (typeof s.paint === 'string' ? s.paint.replace(/[^A-Za-z0-9+/=]/g, '').slice(0, 1200) : ''),
       name: str(s.name, 24).replace(/\n/g, ' ').trim(),
       author: str(s.author, 24).replace(/\n/g, ' ').trim(),

@@ -6,7 +6,11 @@
   var mode = 'title', last = 0, time = 0;
   var spec = T.defaultSpec((Math.random() * 0xffffffff) | 0);
   var mask = T.planet.circleMask(T.SHAPE_N), inflate = 1, popT = -1, popFrom = 0;
-  var planets = [], store = null, cam = { x: 0, y: 0, z: 1 }, drag = null, pinch0 = null;
+  var planets = [], store = null, cam = { x: 0, y: 0, z: 1 }, drag = null, pinch = null;
+  var pointers = new Map(), inertia = { vx: 0, vy: 0 };
+  var lastTap = 0, lastTapX = 0, lastTapY = 0, tapTimer = null, suppressClickUntil = 0, zoomAnim = null;
+  var revealT = -1;
+  var ZMIN = 0.12, ZMAX = 6;
   var hover = null, selected = null, keys = { left: 0, right: 0, jump: 0 };
   var world = null, tool = null, erase = false, painting = false;
   var launch = null, titleSpec, titlePlanet = 0;
@@ -21,6 +25,39 @@
     el.hidden = false; el.textContent = s;
     clearTimeout(toast._t);
     toast._t = setTimeout(function () { el.hidden = true; }, 2800);
+  }
+  function motionOk() {
+    return !(T.reduced || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches));
+  }
+  function isPreviewLocal() {
+    try { return /[?&]local=1\b/.test(location.search); } catch (e) { return false; }
+  }
+  function kickReveal() {
+    if (!motionOk()) { revealT = -1; return; }
+    revealT = 0;
+  }
+  function camZoomAt(sx, sy, nz) {
+    var z0 = cam.z, z1 = T.clamp(nz, ZMIN, ZMAX);
+    var wx = cam.x + (sx - W / 2) / z0, wy = cam.y + (sy - H / 2) / z0;
+    cam.z = z1;
+    cam.x = wx - (sx - W / 2) / z1;
+    cam.y = wy - (sy - H / 2) / z1;
+  }
+  function tickCam(dt) {
+    if (zoomAnim) {
+      zoomAnim.t += dt;
+      var u = Math.min(1, zoomAnim.t / zoomAnim.dur);
+      var e = 1 - Math.pow(1 - u, 3);
+      camZoomAt(zoomAnim.x, zoomAnim.y, zoomAnim.from + (zoomAnim.to - zoomAnim.from) * e);
+      if (u >= 1) zoomAnim = null;
+    }
+    if (drag || pinch || pointers.size) return;
+    if (!motionOk()) { inertia.vx = inertia.vy = 0; return; }
+    cam.x += inertia.vx * dt;
+    cam.y += inertia.vy * dt;
+    inertia.vx *= Math.exp(-3.6 * dt);
+    inertia.vy *= Math.exp(-3.6 * dt);
+    if (Math.hypot(inertia.vx, inertia.vy) < 0.02) inertia.vx = inertia.vy = 0;
   }
 
   function resize() {
@@ -345,8 +382,9 @@
     $('msg-count').textContent = m.length + '/160';
   }
 
-  function showMode(next) {
+  function applyMode(next) {
     mode = next;
+    ['title-ui', 'builder', 'card'].forEach(function (id) { var el = $(id); if (el) el.classList.remove('fx-out'); });
     $('title-ui').hidden = next !== 'title';
     $('builder').hidden = next !== 'builder';
     $('back-btn').hidden = next === 'title' || next === 'launch' || next === 'surface';
@@ -354,10 +392,18 @@
     $('card').hidden = next !== 'inspect';
     $('surface-ui').hidden = next !== 'surface';
     $('music-credit').hidden = next === 'builder' || next === 'surface';
-    $('back-btn').hidden = next === 'title' || next === 'launch' || next === 'surface';
     $('back-btn').textContent = next === 'builder' ? 'Back' : 'Title';
     if (next === 'system') frameSystem();
     say(next === 'title' ? 'Terra.' : next === 'builder' ? 'Make a planet.' : next === 'system' ? 'The shared solar system.' : '');
+  }
+  function showMode(next, instant) {
+    if (next === mode || instant || !motionOk()) { clearTimeout(showMode._t); applyMode(next); return; }
+    var prev = mode;
+    var layer = prev === 'title' ? $('title-ui') : prev === 'builder' ? $('builder') : prev === 'inspect' ? $('card') : null;
+    if (!layer || layer.hidden) { applyMode(next); return; }
+    layer.classList.add('fx-out');
+    clearTimeout(showMode._t);
+    showMode._t = setTimeout(function () { applyMode(next); }, 200);
   }
 
   /* ---------- store / system ---------- */
@@ -388,27 +434,51 @@
     if (T.sfx) T.sfx.open();
   }
 
+  function hideSaveFail() {
+    var el = $('save-fail'); if (el) el.hidden = true;
+  }
+  function showSaveFail(msg) {
+    var el = $('save-fail'), p = $('save-fail-msg');
+    if (p) p.textContent = msg || 'The shared sky could not be reached. Your planet is still here — retry to set it among the others.';
+    if (el) el.hidden = false;
+    if (T.sfx) T.sfx.deny();
+  }
   async function launchPlanet() {
     readFields(); applyMaskToSpec();
+    hideSaveFail();
     var F = T.filter;
     if (F && (F.has(spec.name) || F.has(spec.author) || F.has(spec.msg))) { $('note').textContent = 'Please keep it kind.'; if (T.sfx) T.sfx.deny(); return; }
     $('note').textContent = '';
     if (!spec.name || !spec.name.trim()) spec.name = T.autoName(spec.seed);
     if (T.sfx) T.sfx.takeoff();
-    var from = { x: (W * 0.38) | 0, y: (H * 0.5) | 0, r: Math.min(W, H) * 0.28 };
-    showMode('launch');
+    var L = builderLayout();
+    var from = { x: L.cx, y: L.cy, r: L.viewR };
+    showMode('launch', true);
     launch = { t: 0, from: from, spec: T.cleanSpec(spec), waiting: true };
     try {
       var res = await store.add(spec);
+      var preview = isPreviewLocal();
+      var remoteOk = res && res.ok && res.planet && (preview || res.mode === 'remote' || res.mode === 'local' && preview);
+      if (!preview && (!res || !res.ok || res.mode !== 'remote' || !res.planet)) {
+        launch.waiting = false; launch = null;
+        showMode('builder', true);
+        showSaveFail(res && res.error);
+        return;
+      }
       planets = res.all || planets.concat([res.planet]);
       T.rememberMine(res.planet.id);
       launch.planet = res.planet;
       launch.waiting = false;
     } catch (e) {
-      toast('Saved only on this device.');
-      var local = Object.assign({ id: T.uid(), n: planets.length + 1, ts: Date.now(), builds: [], gifts: [] }, T.cleanSpec(spec));
-      planets.push(local); T.rememberMine(local.id);
-      launch.planet = local; launch.waiting = false;
+      launch.waiting = false; launch = null;
+      showMode('builder', true);
+      if (isPreviewLocal()) {
+        var local = Object.assign({ id: T.uid(), n: planets.length + 1, ts: Date.now(), builds: [], gifts: [] }, T.cleanSpec(spec));
+        planets.push(local); T.rememberMine(local.id);
+        toast('Saved only on this device.');
+        return;
+      }
+      showSaveFail(e && e.message);
     }
   }
 
@@ -497,6 +567,7 @@
       if (xx < 0 || yy < 0 || xx >= n || yy >= n) continue;
       if (i * i + j * j <= rad * rad) mask[yy * n + xx] = erase ? 0 : 1;
     }
+    spec.shapeKind = null;
     paintDrawbox();
   }
 
@@ -628,10 +699,15 @@
   }
 
   function drawBuilder() {
-    var cx = (W * 0.36) | 0, cy = (H * 0.5) | 0, R = Math.min(W, H) * 0.32;
-    if (W < 420) { cx = (W / 2) | 0; cy = Math.round(H * 0.32); R = Math.min(W, H) * 0.22; }
+    var L = builderLayout(), cx = L.cx, cy = L.cy, R = L.viewR;
+    ctx.save();
+    if (revealT >= 0 && motionOk()) {
+      var k = 1 + Math.sin(Math.min(1, revealT) * Math.PI) * 0.07;
+      ctx.translate(cx, cy); ctx.scale(k, k); ctx.translate(-cx, -cy);
+    }
     if (popT >= 0 && inflate < 0.2) T.planet.flatDraw(ctx, cx, cy, R, spec, mask);
     else T.planet.draw(ctx, cx, cy, R, spec, time, [-0.62, -0.4, 0.66], { live: true, inflate: inflate < 1 ? inflate : undefined });
+    ctx.restore();
   }
 
   function drawSystem(focus) {
@@ -760,6 +836,11 @@
       inflate = e < 1 ? e * 1.16 : 1 - (1 - Math.min(1, (popT - 1) / 0.18)) * 0.16;
       if (popT >= 1.18) { inflate = 1; popT = -1; }
     }
+    if (revealT >= 0) {
+      revealT += dt / 0.42;
+      if (revealT >= 1) revealT = -1;
+    }
+    if (mode === 'system' || mode === 'inspect') tickCam(dt);
     ctx.fillStyle = '#120e0c';
     ctx.fillRect(0, 0, W, H);
     if (mode !== 'surface') drawStars();
@@ -773,9 +854,24 @@
 
   /* ---------- boot ---------- */
   function builderLayout() {
-    var cx = (W * 0.36) | 0, cy = (H * 0.5) | 0, R = Math.min(W, H) * 0.32;
-    if (W < 420) { cx = (W / 2) | 0; cy = Math.round(H * 0.32); R = Math.min(W, H) * 0.22; }
-    return { cx: cx, cy: cy, viewR: R, bodyR: T.planet.bodyRadius(R, spec.size), rot: time * (T.reduced ? 0.12 : 0.28) };
+    var fx0 = 0, fy0 = 0, fx1 = W, fy1 = H, panel = $('builder');
+    if (panel && !panel.hidden) {
+      var r = panel.getBoundingClientRect();
+      var px = r.left / scale, py = r.top / scale;
+      var mobile = (window.matchMedia && matchMedia('(max-width: 720px)').matches) || r.top > innerHeight * 0.45;
+      if (mobile) fy1 = Math.max(48, Math.min(H, py) - 4);
+      else if (r.left > innerWidth * 0.35) fx1 = Math.max(48, Math.min(W, px) - 4);
+    }
+    var cx = (fx0 + fx1) / 2, cy = (fy0 + fy1) / 2;
+    var budget = Math.max(18, Math.min(fx1 - fx0, fy1 - fy0) / 2 - 10);
+    var fitSpec = Object.assign({}, spec, { size: 1 });
+    var lo = 8, hi = Math.max(fx1 - fx0, fy1 - fy0, 40), i, mid, ext;
+    for (i = 0; i < 16; i++) {
+      mid = (lo + hi) / 2;
+      ext = T.planet.maxExtent(fitSpec, mid);
+      if (ext <= budget) lo = mid; else hi = mid;
+    }
+    return { cx: Math.round(cx), cy: Math.round(cy), viewR: lo, bodyR: T.planet.bodyRadius(lo, spec.size), rot: time * (T.reduced ? 0.12 : 0.28) };
   }
   function tryPaintAt(sx, sy) {
     var L = builderLayout(), uv = T.planet.pickUV(sx, sy, L.cx, L.cy, L.bodyR, L.rot);
@@ -816,7 +912,7 @@
     var box = $('biomes');
     T.BIOMES.forEach(function (b) {
       var btn = document.createElement('button'); btn.type = 'button'; btn.textContent = T.BIOME_LABEL[b] || b; btn.setAttribute('data-biome', b);
-      btn.addEventListener('click', function () { spec.biome = b; if (T.sfx) T.sfx.click(); syncFromSpec(); });
+      btn.addEventListener('click', function () { var from = spec.biome; spec.biome = b; if (from === 'slate' && b !== 'slate') kickReveal(); if (T.sfx) T.sfx.click(); syncFromSpec(); });
       box.appendChild(btn);
     });
     var cp = $('cloudpats');
@@ -848,26 +944,31 @@
     titleSpec.rings = [{ inner: 0.14, outer: 0.4, tilt: 0.38, color: 'gold', banding: 0.45, density: 0.62 }];
     titleSpec.moons = [T.defaultMoon(0x71ee4a2, 0)];
     titleSpec.moons[0].type = 'icy'; titleSpec.moons[0].size = 0.42; titleSpec.moons[0].dist = 0.82;
-    spec = T.defaultSpec(0x51a7e0);
-    spec.biome = 'garden'; spec.land = 0.6; spec.clouds = 0.4; spec.cloudPat = 'wispy';
-    spec.atmo = 0.65; spec.atmoHue = 0.55; spec.iceCaps = 0.35; spec.city = 0.2;
-    spec.craters = 0.15; spec.volcanoes = 0; spec.aurora = 0.1; spec.glow = 0.1;
-    spec.size = 0.5; spec.rings = []; spec.moons = [T.defaultMoon(spec.seed, 0)];
-    spec.moons[0].type = 'rocky'; spec.name = '';
-    mask = T.planet.circleMask(T.SHAPE_N); spec.shape = null;
+    spec = T.blankSpec(0x51a7e0);
+    mask = T.planet.circleMask(T.SHAPE_N); spec.shape = null; spec.shapeKind = null;
     fillChoices(); fillPaint(); bindDynamic(); syncFromSpec(); syncMusic();
     showMode('title');
     store = T.openStore();
     await loadPlanets();
 
     $('music-btn').addEventListener('click', function () { T.music.toggle(); syncMusic(); if (T.sfx) T.sfx.click(); });
-    $('btn-shape').addEventListener('click', function () { if (T.sfx) T.sfx.open(); showMode('builder'); });
-    $('btn-visit').addEventListener('click', function () { if (T.sfx) T.sfx.open(); cam = { x: 0, y: 0, z: 1 }; showMode('system'); });
-    $('make-btn').addEventListener('click', function () { if (T.sfx) T.sfx.open(); showMode('builder'); });
+    function startNewPlanet() {
+      var keepAuthor = $('p-author') ? $('p-author').value : (spec.author || '');
+      spec = T.blankSpec((Math.random() * 0xffffffff) | 0);
+      spec.author = keepAuthor;
+      mask = T.planet.circleMask(T.SHAPE_N); spec.shape = null; spec.shapeKind = null;
+      inflate = 1; popT = -1; revealT = -1;
+      syncFromSpec();
+      if (T.sfx) T.sfx.open();
+      showMode('builder');
+    }
+    $('btn-shape').addEventListener('click', startNewPlanet);
+    $('btn-visit').addEventListener('click', function () { if (T.sfx) T.sfx.open(); cam = { x: 0, y: 0, z: 1 }; inertia.vx = inertia.vy = 0; showMode('system'); });
+    $('make-btn').addEventListener('click', startNewPlanet);
     $('back-btn').addEventListener('click', goBack);
     $('tabs').addEventListener('click', function (e) { var b = e.target.closest('[data-tab]'); if (!b) return; setTab(b.getAttribute('data-tab')); if (T.sfx) T.sfx.click(); });
     ['p-size','p-land','p-craters','p-volcanoes','p-iceCaps','p-clouds','p-atmo','p-aurora','p-city','p-glow'].forEach(function (id) {
-      $(id).addEventListener('input', function () { readFields(); if (T.sfx) T.sfx.tick(); });
+      $(id).addEventListener('input', function () { var was = spec.biome; readFields(); if (was === 'slate' || +this.value > 0) kickReveal(); if (T.sfx) T.sfx.tick(); });
     });
     ['p-name','p-author','p-msg'].forEach(function (id) { $(id).addEventListener('input', readFields); });
     document.querySelectorAll('#paint-brush [data-brush]').forEach(function (b) {
@@ -887,18 +988,21 @@
       var keepAuthor = $('p-author').value;
       spec = T.defaultSpec((Math.random() * 0xffffffff) | 0);
       spec.author = keepAuthor; spec.name = T.autoName(spec.seed);
-      mask = T.planet.circleMask(T.SHAPE_N); spec.shape = null; inflate = 1;
+      mask = T.planet.circleMask(T.SHAPE_N); spec.shape = null; spec.shapeKind = null; inflate = 1;
+      kickReveal();
       if (T.sfx) T.sfx.whoosh();
       syncFromSpec();
     });
     $('add-ring').addEventListener('click', function () {
       if (spec.rings.length >= 3) { toast('Three rings is enough.'); if (T.sfx) T.sfx.deny(); return; }
       spec.rings.push(T.defaultRing(spec.seed, spec.rings.length));
+      kickReveal();
       if (T.sfx) T.sfx.click(); renderRingsUI();
     });
     $('add-moon').addEventListener('click', function () {
       if (spec.moons.length >= 3) { toast('Three moons is enough.'); if (T.sfx) T.sfx.deny(); return; }
       spec.moons.push(T.defaultMoon(spec.seed, spec.moons.length));
+      kickReveal();
       if (T.sfx) T.sfx.click(); renderMoonsUI();
     });
     $('btn-launch').addEventListener('click', launchPlanet);
@@ -912,6 +1016,7 @@
         b.classList.add('on');
         var k = b.getAttribute('data-shape');
         mask = T.planet.presetMask(k, T.SHAPE_N);
+        spec.shapeKind = (k && k !== 'sphere') ? k : null;
         applyMaskToSpec();
         paintDrawbox();
         if (k !== 'sphere') startPop(); else { inflate = 1; popT = -1; if (T.sfx) T.sfx.click(); }
@@ -939,27 +1044,73 @@
     }
     hold('pad-left', 'left'); hold('pad-right', 'right'); hold('pad-jump', 'jump');
 
+    function ptrXY(ev) { return canvasPos(ev); }
+    function midPtrs() {
+      var arr = Array.from(pointers.values());
+      return { x: (arr[0].x + arr[1].x) / 2, y: (arr[0].y + arr[1].y) / 2, d: Math.hypot(arr[0].x - arr[1].x, arr[0].y - arr[1].y) };
+    }
+    function beginPinch() {
+      if (pointers.size < 2) return;
+      var m = midPtrs();
+      pinch = {
+        dist: Math.max(8, m.d), z: cam.z,
+        wx: cam.x + (m.x - W / 2) / cam.z,
+        wy: cam.y + (m.y - H / 2) / cam.z
+      };
+      drag = null;
+      inertia.vx = inertia.vy = 0;
+      suppressClickUntil = performance.now() + 420;
+      if (tapTimer) { clearTimeout(tapTimer); tapTimer = null; }
+    }
+    function updatePinch() {
+      if (!pinch || pointers.size < 2) return;
+      var m = midPtrs(), nz = T.clamp(pinch.z * (m.d / pinch.dist), ZMIN, ZMAX);
+      cam.z = nz;
+      cam.x = pinch.wx - (m.x - W / 2) / nz;
+      cam.y = pinch.wy - (m.y - H / 2) / nz;
+      suppressClickUntil = performance.now() + 420;
+    }
     canvas.addEventListener('pointerdown', function (e) {
       if (mode === 'surface') { if (tool) placeHere(); return; }
-      var p = canvasPos(e);
-      if (mode === 'builder' && builderTab === 'paint') {
+      var p = ptrXY(e);
+      if (mode === 'builder' && builderTab === 'paint' && e.isPrimary !== false && pointers.size === 0) {
         paintDrag = true;
         try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
         if (tryPaintAt(p.x, p.y) && T.sfx) T.sfx.tick();
         return;
       }
       if (mode !== 'system' && mode !== 'inspect') return;
-      drag = { x: p.x, y: p.y, cx: cam.x, cy: cam.y, moved: 0 };
+      e.preventDefault();
+      try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+      pointers.set(e.pointerId, { x: p.x, y: p.y });
+      if (pointers.size >= 2) beginPinch();
+      else if (!pinch) {
+        drag = { x: p.x, y: p.y, lx: p.x, ly: p.y, cx: cam.x, cy: cam.y, moved: 0, id: e.pointerId, t: performance.now() };
+        inertia.vx = inertia.vy = 0;
+      }
     });
     canvas.addEventListener('pointermove', function (e) {
-      var p = canvasPos(e);
+      var p = ptrXY(e);
       if (mode === 'builder' && paintDrag && builderTab === 'paint') { tryPaintAt(p.x, p.y); return; }
-      if (drag && (mode === 'system' || mode === 'inspect')) {
+      if (pointers.has(e.pointerId)) {
+        pointers.set(e.pointerId, { x: p.x, y: p.y });
+        e.preventDefault();
+      }
+      if (pointers.size >= 2 && (mode === 'system' || mode === 'inspect')) {
+        if (!pinch) beginPinch();
+        updatePinch();
+        return;
+      }
+      if (pinch) return;
+      if (drag && drag.id === e.pointerId && (mode === 'system' || mode === 'inspect')) {
         var dx = (p.x - drag.x) / cam.z, dy = (p.y - drag.y) / cam.z;
         cam.x = drag.cx - dx; cam.y = drag.cy - dy;
-        if (Math.hypot(p.x - drag.x, p.y - drag.y) > 4) drag.moved = 1;
+        var stepX = (p.x - drag.lx) / cam.z, stepY = (p.y - drag.ly) / cam.z;
+        inertia.vx = -stepX * 55; inertia.vy = -stepY * 55;
+        drag.lx = p.x; drag.ly = p.y;
+        if (Math.hypot(p.x - drag.x, p.y - drag.y) > 5) drag.moved = 1;
       }
-      if (mode === 'system') {
+      if (mode === 'system' && pointers.size < 2 && !pinch) {
         var hit = hitPlanet(p.x, p.y);
         var chip = $('hoverchip');
         hoverP = hit && hit.p;
@@ -973,21 +1124,62 @@
         } else { hoverP = null; chip.hidden = true; canvas.style.cursor = 'default'; }
       }
     });
-    canvas.addEventListener('pointerup', function (e) {
+    function endPointer(e) {
       paintDrag = false;
-      if (drag && !drag.moved && (mode === 'system' || mode === 'inspect')) {
-        var p = canvasPos(e), hit = hitPlanet(p.x, p.y);
-        if (hit) openCard(hit.p);
-        else if (mode === 'inspect') goBack();
+      var p = ptrXY(e);
+      var wasPinch = !!pinch;
+      pointers.delete(e.pointerId);
+      try { canvas.releasePointerCapture(e.pointerId); } catch (err) {}
+      if (wasPinch) {
+        if (pointers.size < 2) pinch = null;
+        drag = null;
+        suppressClickUntil = performance.now() + 280;
+        return;
       }
-      drag = null;
-    });
+      if (drag && drag.id === e.pointerId) {
+        var now = performance.now();
+        var canClick = !drag.moved && now > suppressClickUntil && (mode === 'system' || mode === 'inspect');
+        if (canClick) {
+          var dist = Math.hypot(p.x - lastTapX, p.y - lastTapY);
+          if (lastTap && now - lastTap < 320 && dist < 28) {
+            if (tapTimer) { clearTimeout(tapTimer); tapTimer = null; }
+            lastTap = 0;
+            var target = cam.z < 2.2 ? Math.min(ZMAX, cam.z * 2) : Math.max(ZMIN, cam.z * 0.5);
+            if (motionOk()) zoomAnim = { x: p.x, y: p.y, from: cam.z, to: target, t: 0, dur: 0.26 };
+            else camZoomAt(p.x, p.y, target);
+            suppressClickUntil = now + 400;
+          } else {
+            lastTap = now; lastTapX = p.x; lastTapY = p.y;
+            var hit = hitPlanet(p.x, p.y);
+            var inspectBg = mode === 'inspect' && !hit;
+            if (tapTimer) clearTimeout(tapTimer);
+            tapTimer = setTimeout(function () {
+              tapTimer = null;
+              if (performance.now() < suppressClickUntil) return;
+              if (hit) openCard(hit.p);
+              else if (inspectBg) goBack();
+            }, 280);
+          }
+        }
+        drag = null;
+      }
+    }
+    canvas.addEventListener('pointerup', endPointer);
+    canvas.addEventListener('pointercancel', endPointer);
     canvas.addEventListener('wheel', function (e) {
       if (mode !== 'system' && mode !== 'inspect') return;
       e.preventDefault();
-      var p = canvasPos(e), before = cam.z;
-      cam.z = T.clamp(cam.z * (e.deltaY > 0 ? 0.9 : 1.11), 0.12, 6);
+      var p = canvasPos(e);
+      camZoomAt(p.x, p.y, cam.z * (e.deltaY > 0 ? 0.9 : 1.11));
     }, { passive: false });
+    canvas.addEventListener('touchstart', function (e) {
+      if (mode === 'system' || mode === 'inspect') e.preventDefault();
+    }, { passive: false });
+    ['gesturestart', 'gesturechange', 'gestureend'].forEach(function (ev) {
+      document.addEventListener(ev, function (e) { e.preventDefault(); }, { passive: false });
+    });
+    if ($('save-retry')) $('save-retry').addEventListener('click', function () { hideSaveFail(); launchPlanet(); });
+    if ($('save-dismiss')) $('save-dismiss').addEventListener('click', hideSaveFail);
 
     addEventListener('resize', resize);
     T.debug = {
@@ -1010,7 +1202,9 @@
       setTool: function (k) { tool = k; document.querySelectorAll('#s-tools .ibtn').forEach(function (x) { x.classList.toggle('on', x.getAttribute('data-tool') === k); }); if (T.ui && T.ui.skinAll) T.ui.skinAll(); },
       paint: function (lon, lat, color, r) { T.stampPaint(spec, lon, lat, color == null ? paintColor : color, r || paintBrush); },
       setTab: setTab,
-      frameSystem: frameSystem
+      frameSystem: frameSystem,
+      get cam() { return cam; },
+      zoomAt: camZoomAt
     };
     last = performance.now();
     requestAnimationFrame(loop);

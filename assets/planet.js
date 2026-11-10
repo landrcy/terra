@@ -15,7 +15,8 @@
     tundra: { deep:['#0c1828','#183048','#2a4a68'], shallow:['#2a4a68','#4a78a0','#88b4c8'], sand:['#6a5a40','#9a8a68','#c8c0a0'], land:['#2a3428','#4a5840','#6a7a58','#8a9a70'], rock:['#3a3a3c','#5a5a5e','#7a7a80'], snow:['#c0c8d0','#e4eaf0','#ffffff'], cloud:['#8890a0','#c8d0d8','#f4f6fa'], atmo:['#182838','#3a5878','#88b0c8','#d8eef8'] },
     ice:    { deep:['#0a2040','#183868','#2a5890'], shallow:['#2a5890','#4a88c0','#88c4e8'], sand:['#88a0b8','#c0d4e0','#e8f2f8'], land:['#4a6a88','#7a9ab8','#b0cce0'], rock:['#3a4a5a','#5a6a7a','#8a9aaa'], snow:['#c8d8e8','#e8f2fa','#ffffff'], cloud:['#90a8c0','#d0e0ec','#f8fcff'], atmo:['#102848','#3a70a8','#90d0f0','#e8f8ff'] },
     lava:   { deep:['#140808','#2a1010','#3a1814'], shallow:['#3a1814','#5a2420'], sand:['#3a2018','#5a3020'], land:['#18090f','#2c1219','#43202a','#5a2c30','#6a4030'], rock:['#1a1010','#2c1a18','#4a2c28'], snow:['#6a6058','#9a9088'], cloud:['#4a3030','#8a6860','#c8a8a0'], atmo:['#2a0808','#8a2010','#e05018','#ffb040'] },
-    storm:  { deep:['#1a1020','#2a1840'], shallow:['#2a1840'], sand:['#6b3a22'], land:['#6b3a22','#9a5a30','#c98a52','#e8b886','#f4dcb4','#fff2da'], rock:['#4a3020','#7a5840'], snow:['#e8dcc8','#fff8ec'], cloud:['#c0a070','#e8d8b0','#fff8e0'], atmo:['#3a2010','#8a5030','#d4a070','#ffe8c8'] }
+    storm:  { deep:['#1a1020','#2a1840'], shallow:['#2a1840'], sand:['#6b3a22'], land:['#6b3a22','#9a5a30','#c98a52','#e8b886','#f4dcb4','#fff2da'], rock:['#4a3020','#7a5840'], snow:['#e8dcc8','#fff8ec'], cloud:['#c0a070','#e8d8b0','#fff8e0'], atmo:['#3a2010','#8a5030','#d4a070','#ffe8c8'] },
+    slate:  { deep:['#2a2a2c','#3a3a3e'], shallow:['#3a3a3e','#4a4a4e'], sand:['#5a5a5e','#6a6a70'], land:['#3a3a3e','#4e4e54','#6a6a70','#8a8a90','#a8a8b0'], rock:['#3a3a3e','#5a5a60','#7a7a80'], snow:['#b0b0b6','#d0d0d6','#f0f0f4'], cloud:['#7a7a80','#b0b0b6','#e8e8ec'], atmo:['#2a2a30','#4a4a58','#8a8a98','#d0d0d8'] }
   };
   var RINGPAL = {
     gold:['#3a2a14','#6a4a24','#a88848','#d4c080','#f0e8c0'],
@@ -59,6 +60,7 @@
     var ox = r() * 40, oy = r() * 40, oz = r() * 40, sea = 0.28 + (1 - spec.land) * 0.5;
     if (spec.biome === 'storm') sea = 2;
     if (spec.biome === 'ocean') sea = 0.52 + (1 - spec.land) * 0.28;
+    if (spec.biome === 'slate') sea = -1;
     var craters = [], vols = [], i, j, k;
     var nc = Math.round(spec.craters * 22);
     for (k = 0; k < nc; k++) {
@@ -82,6 +84,9 @@
           var tex = T.fbm3(x * 9, y * 22, z * 9, seed + 7, 3);
           h = T.clamp(bnd * 200 + tex * 55, 0, 255) | 0;
           cld = T.clamp((T.fbm3(x * 3, y * 8, z * 3, seed + 21, 3) - (0.62 - spec.clouds * 0.25)) * 600, 0, 255);
+        } else if (spec.biome === 'slate') {
+          land = 1;
+          h = 120 + (((T.fbm3(x * 6, y * 6, z * 6, seed, 3) - 0.5) * 16) | 0);
         } else {
           el = T.fbm3(x * 1.5 + ox, y * 1.5 + oy, z * 1.5 + oz, seed, 5) + 0.22 * T.fbm3(x * 5 + oz, y * 5 + ox, z * 5, seed + 9, 3);
           for (k = 0; k < craters.length; k++) {
@@ -160,20 +165,27 @@
   }
 
   /* ---------- sphere (default body) ---------- */
-  function shade(col, raw, x, y, emit) {
+  function shade(col, raw, x, y, emit, rim) {
     if (emit > 160) return [Math.min(255, col[0] + 40), Math.min(255, col[1] + 10), Math.min(255, Math.max(col[2], 20))];
-    var sv = raw + (T.bayer(x, y) - 0.5) * 0.08;
-    if (sv < 0.36) {
-      var k = sv < 0.16 ? 0.62 : 0.4;
-      return [col[0] + (SHD[0] - col[0]) * k, col[1] + (SHD[1] - col[1]) * k, col[2] + (SHD[2] - col[2]) * k].map(Math.round);
+    var sv = raw + (T.bayer(x, y) - 0.5) * 0.05;
+    var out;
+    if (sv < 0.38) {
+      var k = sv < 0.14 ? 0.58 : sv < 0.26 ? 0.4 : 0.22;
+      out = [col[0] + (SHD[0] - col[0]) * k, col[1] + (SHD[1] - col[1]) * k, col[2] + (SHD[2] - col[2]) * k].map(Math.round);
+    } else if (raw > 0.84) out = col.map(function (v) { return Math.min(255, Math.round(v * 1.08 + 14)); });
+    else out = col;
+    if (rim > 0.04) {
+      var rk = T.clamp(rim, 0, 1) * 0.5;
+      out = [Math.min(255, out[0] + (230 - out[0]) * rk + 10 * rk),
+             Math.min(255, out[1] + (220 - out[1]) * rk + 12 * rk),
+             Math.min(255, out[2] + (240 - out[2]) * rk + 18 * rk)].map(Math.round);
     }
-    if (raw > 0.82) return col.map(function (v) { return Math.min(255, Math.round(v * 1.1 + 16)); });
-    return col;
+    return out;
   }
 
   function paintSphere(img, cx, cy, R, spec, map, rot, light, t) {
     var W = img.width, H = img.height, d = img.data, lx = light[0], ly = light[1], lz = light[2];
-    var atmW = Math.max(2, R * (0.1 + spec.atmo * 0.18)), glowW = atmW + R * spec.glow * 0.22;
+    var atmW = spec.atmo > 0.04 ? Math.max(2, R * (0.1 + spec.atmo * 0.18)) : 0, glowW = atmW + R * spec.glow * 0.22;
     var ar = atmoRamp(spec.atmoHue), pal = map.pal;
     var x0 = Math.max(0, (cx - R - glowW - 1) | 0), x1 = Math.min(W - 1, (cx + R + glowW + 1) | 0);
     var y0 = Math.max(0, (cy - R - glowW - 1) | 0), y1 = Math.min(H - 1, (cy + R + glowW + 1) | 0);
@@ -225,24 +237,75 @@
     for (j = 0; j < n; j++) for (i = 0; i < n; i++) { dx = i + 0.5 - cx; dy = j + 0.5 - cy; if (dx * dx + dy * dy <= r * r) m[j * n + i] = 1; }
     return m;
   };
+  function smin(a, b, k) {
+    k = k || 0.12;
+    var h = Math.max(0, Math.min(1, 0.5 + 0.5 * (b - a) / k));
+    return (1 - h) * b + h * a - k * h * (1 - h);
+  }
+  function smax(a, b, k) { return -smin(-a, -b, k); }
+  function sdCircle(x, y, cx, cy, r) { return Math.hypot(x - cx, y - cy) - r; }
+  function sdEllipse(x, y, cx, cy, rx, ry) {
+    var px = (x - cx) / Math.max(1e-6, rx), py = (y - cy) / Math.max(1e-6, ry);
+    var l = Math.hypot(px, py);
+    return (l - 1) * Math.min(rx, ry);
+  }
+  function sdTriangle(px, py, ax, ay, bx, by, cx, cy) {
+    function d2(x, y) { return x * x + y * y; }
+    var e0x = bx - ax, e0y = by - ay, v0x = px - ax, v0y = py - ay;
+    var e1x = cx - bx, e1y = cy - by, v1x = px - bx, v1y = py - by;
+    var e2x = ax - cx, e2y = ay - cy, v2x = px - cx, v2y = py - cy;
+    var t0 = Math.max(0, Math.min(1, (v0x * e0x + v0y * e0y) / d2(e0x, e0y)));
+    var t1 = Math.max(0, Math.min(1, (v1x * e1x + v1y * e1y) / d2(e1x, e1y)));
+    var t2 = Math.max(0, Math.min(1, (v2x * e2x + v2y * e2y) / d2(e2x, e2y)));
+    var d0 = d2(v0x - e0x * t0, v0y - e0y * t0);
+    var d1 = d2(v1x - e1x * t1, v1y - e1y * t1);
+    var d2v = d2(v2x - e2x * t2, v2y - e2y * t2);
+    var s = Math.sign(e0x * v0y - e0y * v0x) + Math.sign(e1x * v1y - e1y * v1x) + Math.sign(e2x * v2y - e2y * v2x);
+    var inside = s > 1 || s < -1;
+    return Math.sqrt(Math.min(d0, d1, d2v)) * (inside ? -1 : 1);
+  }
+  function sdHeart(x, y) {
+    var px = x * 1.08, py = y * 1.05 + 0.08;
+    var lobeR = 0.44, ox = 0.355, oy = 0.34;
+    var L = sdCircle(px, py, -ox, oy, lobeR);
+    var R = sdCircle(px, py, ox, oy, lobeR);
+    var body = sdTriangle(px, py, -0.78, 0.16, 0.78, 0.16, 0, -0.96);
+    return smin(smin(L, R, 0.07), body, 0.1);
+  }
+  function sdPear(x, y) {
+    var px = x * 1.08, py = y * 1.02;
+    var bot = sdEllipse(px, py, 0, -0.22, 0.64, 0.7);
+    var top = sdEllipse(px, py, 0, 0.42, 0.36, 0.44);
+    return smin(bot, top, 0.2);
+  }
+  function sdBean(x, y) {
+    var e1 = sdEllipse(x, y, -0.1, 0.06, 0.6, 0.74);
+    var e2 = sdEllipse(x, y, 0.2, -0.14, 0.5, 0.62);
+    var body = smin(e1, e2, 0.18);
+    var cut = sdCircle(x, y, 0.66, 0.14, 0.44);
+    return smax(body, -cut, 0.14);
+  }
+  function sdDiamond(x, y) {
+    var px = Math.abs(x) * 1.02, py = Math.abs(y) * 1.02;
+    var w = 0.8, h = 0.96;
+    var nd = (px / w + py / h - 1) * (w * h) / Math.hypot(h, w);
+    return nd - 0.035;
+  }
+  var SHAPE_SDF = { heart: sdHeart, pear: sdPear, bean: sdBean, diamond: sdDiamond };
+  P.shapeSdf = function (kind, x, y) {
+    var fn = SHAPE_SDF[kind];
+    return fn ? fn(x, y) : Math.hypot(x, y) - 1;
+  };
+
   P.presetMask = function (kind, n) {
     n = n || T.SHAPE_N;
     if (!kind || kind === 'sphere') return P.circleMask(n);
-    var m = new Uint8Array(n * n), i, j;
+    var m = new Uint8Array(n * n), i, j, x, y, fn = SHAPE_SDF[kind];
+    if (!fn) return P.circleMask(n);
     for (j = 0; j < n; j++) for (i = 0; i < n; i++) {
-      var x = (i + 0.5) / n * 2 - 1, y = -((j + 0.5) / n * 2 - 1), on = 0;
-      if (kind === 'heart') {
-        x *= 1.15; y = y * 1.15 - 0.05;
-        on = Math.pow(x * x + y * y - 1, 3) - x * x * y * y * y <= 0;
-      } else if (kind === 'pear') {
-        var yy = y * 1.05 - 0.05, r1 = 0.38 - yy * 0.18; if (r1 < 0.18) r1 = 0.18;
-        on = x * x + (yy - 0.15) * (yy - 0.15) / 1.35 <= r1 * r1 || (x * x + (yy + 0.42) * (yy + 0.42) <= 0.22 * 0.22);
-      } else if (kind === 'bean') {
-        on = (x + 0.18) * (x + 0.18) / 0.72 + y * y / 0.5 <= 0.38 || (x - 0.22) * (x - 0.22) / 0.55 + (y - 0.08) * (y - 0.08) / 0.42 <= 0.28;
-      } else if (kind === 'diamond') {
-        on = Math.abs(x) + Math.abs(y) * 1.15 <= 0.92;
-      }
-      if (on) m[j * n + i] = 1;
+      x = (i + 0.5) / n * 2 - 1;
+      y = -((j + 0.5) / n * 2 - 1);
+      m[j * n + i] = fn(x, y) <= 0 ? 1 : 0;
     }
     return m;
   };
@@ -262,30 +325,52 @@
       return m;
     } catch (e) { return P.circleMask(n); }
   };
+
+  /* Signed Euclidean distance: + inside, - outside, in grid units. */
+  function edt1d(f, n) {
+    var v = new Int32Array(n), z = new Float64Array(n + 1), d = new Float64Array(n);
+    var k = 0, q, s;
+    v[0] = 0; z[0] = -1e20; z[1] = 1e20;
+    for (q = 1; q < n; q++) {
+      s = ((f[q] + q * q) - (f[v[k]] + v[k] * v[k])) / (2 * q - 2 * v[k]);
+      while (s <= z[k] && k > 0) {
+        k--;
+        s = ((f[q] + q * q) - (f[v[k]] + v[k] * v[k])) / (2 * q - 2 * v[k]);
+      }
+      k++; v[k] = q; z[k] = s; z[k + 1] = 1e20;
+    }
+    k = 0;
+    for (q = 0; q < n; q++) {
+      while (z[k + 1] < q) k++;
+      d[q] = (q - v[k]) * (q - v[k]) + f[v[k]];
+    }
+    return d;
+  }
+  function edt2d(feature, n, dest) {
+    var i, j, f = new Float64Array(n), d, inf = 1e12, horiz = new Float64Array(n * n);
+    for (j = 0; j < n; j++) {
+      for (i = 0; i < n; i++) f[i] = feature[j * n + i] ? 0 : inf;
+      d = edt1d(f, n);
+      for (i = 0; i < n; i++) horiz[j * n + i] = d[i];
+    }
+    for (i = 0; i < n; i++) {
+      for (j = 0; j < n; j++) f[j] = horiz[j * n + i];
+      d = edt1d(f, n);
+      for (j = 0; j < n; j++) dest[j * n + i] = Math.sqrt(Math.max(0, d[j]));
+    }
+  }
   P.sdf = function (m, n) {
-    var d = new Float32Array(n * n), INF = n * 2, i, j, v;
-    for (j = 0; j < n; j++) for (i = 0; i < n; i++) {
-      if (!m[j * n + i]) { d[j * n + i] = 0; continue; }
-      v = INF;
-      if (i) v = Math.min(v, d[j * n + i - 1] + 1);
-      if (j) v = Math.min(v, d[(j - 1) * n + i] + 1);
-      if (i && j) v = Math.min(v, d[(j - 1) * n + i - 1] + 1.414);
-      if (i < n - 1 && j) v = Math.min(v, d[(j - 1) * n + i + 1] + 1.414);
-      d[j * n + i] = v;
-    }
-    for (j = n - 1; j >= 0; j--) for (i = n - 1; i >= 0; i--) {
-      if (!m[j * n + i]) continue;
-      v = d[j * n + i];
-      if (i < n - 1) v = Math.min(v, d[j * n + i + 1] + 1);
-      if (j < n - 1) v = Math.min(v, d[(j + 1) * n + i] + 1);
-      if (i < n - 1 && j < n - 1) v = Math.min(v, d[(j + 1) * n + i + 1] + 1.414);
-      if (i && j < n - 1) v = Math.min(v, d[(j + 1) * n + i - 1] + 1.414);
-      d[j * n + i] = v;
-    }
+    var inside = new Float32Array(n * n), outside = new Float32Array(n * n), i;
+    var inv = new Uint8Array(n * n);
+    for (i = 0; i < m.length; i++) inv[i] = m[i] ? 0 : 1;
+    edt2d(inv, n, inside);
+    edt2d(m, n, outside);
+    var d = new Float32Array(n * n);
+    for (i = 0; i < n * n; i++) d[i] = m[i] ? inside[i] : -outside[i];
     return d;
   };
 
-  function sdfAt(d, n, i, j) { if (i < 0 || j < 0 || i >= n || j >= n) return 0; return d[j * n + i]; }
+  function sdfAt(d, n, i, j) { if (i < 0 || j < 0 || i >= n || j >= n) return -2; return d[j * n + i]; }
 
   function sdfB(d, n, fx, fy) {
     var x0 = Math.floor(fx), y0 = Math.floor(fy), tx = fx - x0, ty = fy - y0;
@@ -293,50 +378,74 @@
       + (1 - tx) * ty * sdfAt(d, n, x0, y0 + 1) + tx * ty * sdfAt(d, n, x0 + 1, y0 + 1);
   }
 
-  /* Per-pixel orthographic raycast into the inflated SDF. Solid coverage, no scanline gaps. */
+  function puffZ(s, sMax) {
+    var r = Math.max(sMax, 1);
+    var v = 2 * r * s - s * s;
+    return Math.sqrt(Math.max(0, v));
+  }
+
+  /* Per-pixel orthographic raycast into a puffy inflated body. */
   function paintVoxel(img, cx, cy, R, spec, map, rot, light, t, inflate) {
     var mask = P.unpackMask(spec.shape, T.SHAPE_N), n = T.SHAPE_N, sdf = P.sdf(mask, n);
+    var kind = spec.shapeKind, fn = SHAPE_SDF[kind];
     var W = img.width, H = img.height, d = img.data;
-    var zbuf = new Float32Array(W * H), i;
+    var zbuf = new Float32Array(W * H), i, sMax = 1;
     for (i = 0; i < zbuf.length; i++) zbuf[i] = -1e9;
     inflate = inflate == null ? 1 : inflate;
     var sc = (R * 2) / n, lx = light[0], ly = light[1], lz = light[2], ca = Math.cos(rot), sa = Math.sin(rot);
-    var mid = n / 2, rad = mid + 1.2;
-    var step = sc >= 2.2 ? 0.4 : sc >= 1.2 ? 0.5 : 0.65;
-    var x0 = Math.max(0, (cx - R - 2) | 0), x1 = Math.min(W - 1, (cx + R + 2) | 0);
-    var y0 = Math.max(0, (cy - R - 2) | 0), y1 = Math.min(H - 1, (cy + R + 2) | 0);
-    var x, y, zr, wx, wy, wz, fx, fy, zm, hit, hx, hy, hz, hwz, ix, iy;
+    var mid = n / 2, rad = mid * 1.2;
+    if (fn) sMax = mid;
+    else { for (i = 0; i < sdf.length; i++) if (sdf[i] > sMax) sMax = sdf[i]; }
+    function samp(fx, fy) {
+      if (fn) {
+        var nx = (fx / n) * 2 - 1, ny = -((fy / n) * 2 - 1);
+        return -fn(nx, ny) * (n / 2);
+      }
+      return sdfB(sdf, n, fx, fy);
+    }
+    var step = sc >= 2.2 ? 0.32 : sc >= 1.2 ? 0.4 : 0.5;
+    var pad = R * 0.2 + 4;
+    var x0 = Math.max(0, (cx - R - pad) | 0), x1 = Math.min(W - 1, (cx + R + pad) | 0);
+    var y0 = Math.max(0, (cy - R - pad) | 0), y1 = Math.min(H - 1, (cy + R + pad) | 0);
+    var x, y, zr, wx, wy, wz, fx, fy, zm, hit, hx, hy, hz, hwz, s;
     for (y = y0; y <= y1; y++) for (x = x0; x <= x1; x++) {
       var xr = (x + 0.5 - cx) / sc, yr = (y + 0.5 - cy) / sc;
-      if (xr * xr + yr * yr > rad * rad * 1.2) continue;
+      if (xr * xr + yr * yr > rad * rad * 1.15) continue;
       hit = 0;
       for (zr = rad; zr >= -rad; zr -= step) {
         wx = xr * ca + zr * sa; wz = -xr * sa + zr * ca; wy = yr;
         fx = wx + mid; fy = wy + mid;
-        if (fx < 0 || fy < 0 || fx >= n - 0.001 || fy >= n - 0.001) continue;
-        ix = fx | 0; iy = fy | 0;
-        if (!mask[iy * n + ix]) continue;
-        zm = sdfB(sdf, n, fx, fy) * inflate;
-        if (Math.abs(wz) <= zm + 0.45) { hit = 1; hx = wx; hy = wy; hz = zr; hwz = wz; break; }
+        if (fx < -1 || fy < -1 || fx > n + 1 || fy > n + 1) continue;
+        s = samp(fx, fy);
+        if (s <= 0) continue;
+        zm = puffZ(s, sMax) * inflate;
+        if (Math.abs(wz) <= zm + 0.35) { hit = 1; hx = wx; hy = wy; hz = zr; hwz = wz; break; }
       }
       if (!hit) continue;
       zbuf[y * W + x] = hz;
-      var e = 0.7;
-      var ddx = (sdfB(sdf, n, hx + mid + e, hy + mid) - sdfB(sdf, n, hx + mid - e, hy + mid)) / (2 * e);
-      var ddy = (sdfB(sdf, n, hx + mid, hy + mid + e) - sdfB(sdf, n, hx + mid, hy + mid - e)) / (2 * e);
-      var ddz = hwz >= 0 ? -1 : 1;
-      var nrx = ddx * ca - ddz * sa, nrz = ddx * sa + ddz * ca, nry = ddy;
-      var len = Math.hypot(nrx, nry, nrz) || 1;
-      var raw = Math.max(0, (nrx * lx + nry * ly + nrz * lz) / len);
-      var lit = Math.max(0, Math.min(1, Math.floor(raw * 7 + (T.bayer(x, y) - 0.5) * 0.55) / 7 + 0.08));
+      var e = 0.55;
+      function hgt(qx, qy) {
+        var ss = samp(qx + mid, qy + mid);
+        return ss > 0 ? puffZ(ss, sMax) * inflate : 0;
+      }
+      var zx = (hgt(hx + e, hy) - hgt(hx - e, hy)) / (2 * e);
+      var zy = (hgt(hx, hy + e) - hgt(hx, hy - e)) / (2 * e);
+      var nz = hwz >= 0 ? 1 : -1;
+      var nrx = -zx, nry = -zy, nrz = nz;
+      var rx = nrx * ca - nrz * sa, rz = nrx * sa + nrz * ca, ry = nry;
+      var len = Math.hypot(rx, ry, rz) || 1;
+      rx /= len; ry /= len; rz /= len;
+      var raw = Math.max(0, rx * lx + ry * ly + rz * lz);
+      var lit = Math.max(0, Math.min(1, Math.floor(raw * 12 + (T.bayer(x, y) - 0.5) * 0.4) / 12 + 0.05));
+      var rim = Math.pow(1 - Math.min(1, Math.abs(rz)), 2.1);
       var rr = Math.hypot(hx, hy, hwz) || 1;
       var lat = Math.asin(T.clamp(hy / rr, -1, 1)), lon = Math.atan2(hx, hwz);
       var sm = terrainColor(map, spec, lon, lat, x, y);
-      var col = shade(sm.col, lit, x, y, sm.em);
+      var col = shade(sm.col, lit, x, y, sm.em, rim);
       var ci = sample(map, lon, lat);
       if (map.C[ci] > 90) {
         var cc = T.dqc(map.pal.cloud, 0.35 + lit * 0.65, x, y);
-        if (T.bayer(x, y) < (map.C[ci] / 255)) col = shade(cc, lit, x, y, 0);
+        if (T.bayer(x, y) < (map.C[ci] / 255)) col = shade(cc, lit, x, y, 0, rim * 0.6);
       }
       if (sm.land && spec.city > 0 && lit < 0.28 && map.L[sm.idx] > 70 && T.hash(x, y, spec.seed) < map.L[sm.idx] / 320) col = [255, 214, 96];
       var o = (y * W + x) * 4; d[o] = col[0]; d[o + 1] = col[1]; d[o + 2] = col[2]; d[o + 3] = 255;

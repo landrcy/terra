@@ -117,25 +117,40 @@
     function lWrite(l) { try { store.setItem(o.localKey, JSON.stringify(l.slice(-o.max))); } catch (e) {} }
 
     async function commit(mutator) {
-      var fresh = [], all = [], result;
+      var fresh = [], all = [], result, err = null, check;
+      var useRemote = mode === 'remote';
       for (var attempt = 0; attempt < 3; attempt++) {
-        if (mode === 'remote') { try { fresh = await rRead(); } catch (e) { mode = 'local'; } }
-        if (mode === 'local') fresh = lRead();
+        fresh = [];
+        if (useRemote) {
+          try { fresh = await rRead(); }
+          catch (e) { err = e; /* stay remote; retry */ continue; }
+        } else fresh = lRead();
         result = mutator(fresh);
         if (result && result.reject) return result;
         all = result.list;
-        if (mode === 'remote') {
+        if (useRemote) {
           try {
             await rWrite(all);
-            var check = await rRead();
-            if (result.verify(check)) return { ok: true, all: check, item: result.item, mode: mode };
+            check = await rRead();
+            if (result.verify(check)) {
+              lWrite(check);
+              return { ok: true, all: check, item: result.item, mode: 'remote', error: null };
+            }
+            err = new Error('verify failed');
             continue;
-          } catch (e) { mode = 'local'; }
+          } catch (e) { err = e; continue; }
         }
-        if (mode === 'local') { lWrite(all); return { ok: true, all: all.slice(-o.max), item: result.item, mode: mode }; }
+        lWrite(all);
+        return { ok: true, all: all.slice(-o.max), item: result.item, mode: 'local', error: null };
       }
-      lWrite(mergePlanets(lRead(), all, o.maxBuilds, o.maxGifts));
-      return { ok: true, all: all.slice(-o.max), item: result && result.item, mode: 'local' };
+      try { lWrite(mergePlanets(lRead(), all, o.maxBuilds, o.maxGifts)); } catch (e2) {}
+      return {
+        ok: false,
+        all: (all && all.length ? all : lRead()).slice(-o.max),
+        item: result && result.item,
+        mode: useRemote ? 'remote' : 'local',
+        error: String((err && (err.message || err)) || 'Could not reach the shared sky.')
+      };
     }
 
     return {
@@ -144,9 +159,11 @@
       isTest: o.url === TEST_URL,
       async list() {
         var l = [];
-        if (mode === 'remote') { try { l = await rRead(); } catch (e) { mode = 'local'; } }
-        if (mode === 'local') l = lRead();
-        return l;
+        if (mode === 'remote') {
+          try { l = await rRead(); lWrite(l); return l; }
+          catch (e) { return lRead(); }
+        }
+        return lRead();
       },
       async add(spec) {
         var s = T.cleanSpec(spec || {});
@@ -157,7 +174,7 @@
           var all = mergePlanets(fresh, [mine], o.maxBuilds, o.maxGifts);
           return { list: all, item: mine, verify: function (check) { return check.some(function (x) { return x.id === mine.id; }); } };
         });
-        return { planet: out.item, all: out.all, mode: out.mode };
+        return { ok: !!out.ok, planet: out.item, all: out.all, mode: out.mode, error: out.error || null };
       },
       async addBuild(planetId, rec) {
         var b = cleanBuild(Object.assign({ id: uid(), ts: Date.now() }, rec));
@@ -173,7 +190,7 @@
           } };
         });
         if (out.reject) return out;
-        return { ok: true, build: out.item, all: out.all, mode: out.mode };
+        return { ok: !!out.ok, build: out.item, all: out.all, mode: out.mode, error: out.error || null };
       },
       async addGift(planetId, rec, visitor) {
         visitor = str(visitor || T.visitorId(), 40);
@@ -192,7 +209,7 @@
           } };
         });
         if (out.reject) return out;
-        return { ok: true, gift: out.item, all: out.all, mode: out.mode };
+        return { ok: !!out.ok, gift: out.item, all: out.all, mode: out.mode, error: out.error || null };
       },
       _clean: cleanList, _merge: mergePlanets
     };

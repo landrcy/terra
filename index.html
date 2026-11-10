@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Terra</title>
 <meta name="description" content="Terra — make a pixel planet and set it in a solar system with everyone else.">
 <meta name="theme-color" content="#120e0c">
@@ -159,6 +159,14 @@
 
 <canvas id="ui-dust" aria-hidden="true"></canvas>
 <p class="toast" id="toast" role="status" aria-live="polite" hidden></p>
+<div id="save-fail" class="dlg" hidden>
+  <h2>Couldn’t add your planet</h2>
+  <p id="save-fail-msg">The shared sky could not be reached. Your planet is safe here — retry to set it among the others.</p>
+  <div class="actions">
+    <button type="button" class="ibtn sun" id="save-retry" data-ico="launch">Retry</button>
+    <button type="button" class="ibtn" id="save-dismiss" data-ico="back">Close</button>
+  </div>
+</div>
 <p id="hoverchip" hidden></p>
 
 <script src="assets/filter.js"></script>
