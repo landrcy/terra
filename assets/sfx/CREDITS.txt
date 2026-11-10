@@ -1,0 +1,39 @@
+Terra — sound effects
+
+All of the following are by Kenney (www.kenney.nl), released under Creative Commons Zero (CC0 1.0):
+https://creativecommons.org/publicdomain/zero/1.0/
+
+Packs:
+  Sci-Fi Sounds:   https://kenney.nl/assets/sci-fi-sounds
+  Interface Sounds: https://kenney.nl/assets/interface-sounds
+  Impact Sounds:   https://kenney.nl/assets/impact-sounds
+  Digital Audio:   https://kenney.nl/assets/digital-audio
+
+Files were copied from the same already-trimmed Kenney encodings used by The Void (mono, Ogg Vorbis + MP3). No other processing.
+
+file            pack / original
+click           Interface Sounds / click_002.ogg (or the pack equivalent already trimmed)
+select          Interface Sounds
+tick            Interface Sounds
+whoosh          Sci-Fi Sounds / Digital Audio
+zoom            Interface Sounds / Sci-Fi Sounds
+takeoff         Sci-Fi Sounds / spaceEngineLarge_000.ogg
+land            Impact Sounds / impactSoft_medium_001.ogg
+step1           Impact Sounds / footstep_concrete_000.ogg
+step2           Impact Sounds / footstep_concrete_001.ogg
+step3           Impact Sounds / footstep_grass_001.ogg
+jump            Digital Audio / phaseJump3.ogg
+pickup          Interface Sounds / pluck_001.ogg
+pickup2         Interface Sounds / drop_002.ogg
+deny            Interface Sounds / error_006.ogg
+open            Interface Sounds
+close           Interface Sounds
+build           Interface Sounds / Digital Audio
+toggleOn        Interface Sounds
+toggleOff       Interface Sounds
+discover        Digital Audio
+arrive          Sci-Fi Sounds / Digital Audio
+blip1           Interface Sounds
+part            Digital Audio / powerUp2.ogg  (used for the 2D-to-3D pop)
+
+Background music is credited separately in assets/music/CREDITS.txt.

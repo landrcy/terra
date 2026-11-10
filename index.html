@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Terra</title>
+<meta name="description" content="Terra — make a pixel planet and set it in a solar system with everyone else.">
+<meta name="theme-color" content="#120e0c">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Terra">
+<meta property="og:title" content="Terra">
+<meta property="og:description" content="Make a pixel planet and set it in a solar system with everyone else.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Terra">
+<meta name="twitter:description" content="Make a pixel planet and set it in a solar system with everyone else.">
+<meta name="music-credit" content="Music: Sunset Walk by KiluaBoy (CC0 1.0) — https://opengameart.org/content/sunset-walk-ambient-quiet-sweet-loop">
+<meta name="sfx-credit" content="Sound effects: Kenney.nl Interface, Sci-Fi, Impact and Digital Audio packs (CC0), www.kenney.nl">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<canvas id="view" aria-hidden="true"></canvas>
+<audio id="bgm" loop preload="auto" playsinline aria-hidden="true"></audio>
+<h1 class="sr">Terra</h1>
+<p class="sr" id="live" role="status" aria-live="polite"></p>
+
+<div id="title-ui" class="layer">
+  <div class="btnrow">
+    <button type="button" class="ibtn sun" id="btn-shape" data-ico="planet">Make a Planet</button>
+    <button type="button" class="ibtn" id="btn-visit" data-ico="system">View the Solar System</button>
+  </div>
+</div>
+<p id="music-credit">Music: Sunset Walk by KiluaBoy (CC0)</p>
+
+<button type="button" class="ibtn" id="music-btn" aria-pressed="true" aria-label="Mute music" data-tip="Music: Sunset Walk by KiluaBoy (CC0)"><canvas width="12" height="8" aria-hidden="true"></canvas></button>
+<button type="button" class="ibtn" id="back-btn" data-ico="back" hidden>Back</button>
+<button type="button" class="ibtn sun" id="make-btn" data-ico="planet" hidden>Make a Planet</button>
+
+<aside id="builder" class="panel" hidden>
+  <h2>Make a Planet</h2>
+  <nav class="tabs" role="tablist" id="tabs">
+    <button type="button" role="tab" data-tab="body" data-ico="body" aria-selected="true">Body</button>
+    <button type="button" role="tab" data-tab="terrain" data-ico="terrain">Terrain</button>
+    <button type="button" role="tab" data-tab="sky" data-ico="sky">Sky</button>
+    <button type="button" role="tab" data-tab="rings" data-ico="ring">Rings</button>
+    <button type="button" role="tab" data-tab="moons" data-ico="moon">Moons</button>
+    <button type="button" role="tab" data-tab="note" data-ico="note">Note</button>
+    <button type="button" role="tab" data-tab="paint" data-ico="draw">Paint</button>
+  </nav>
+
+  <section class="pane on" data-pane="body">
+    <div class="row"><label>Size <span class="val" id="v-size">medium</span></label><input id="p-size" type="range" min="0" max="100" value="50"></div>
+    <p class="help">Draw a silhouette, then pop it into 3D. It will spin as a little planet.</p>
+    <div class="presets" id="shape-presets">
+      <button type="button" class="on" data-shape="sphere" data-ico="sphere">Sphere</button>
+      <button type="button" data-shape="heart" data-ico="heart">Heart</button>
+      <button type="button" data-shape="pear" data-ico="pear">Pear</button>
+      <button type="button" data-shape="bean" data-ico="bean">Bean</button>
+      <button type="button" data-shape="diamond" data-ico="gem">Diamond</button>
+    </div>
+    <canvas id="drawbox" width="48" height="48" style="width:192px;height:192px" aria-label="Draw a 2D silhouette"></canvas>
+    <div class="presets">
+      <button type="button" class="chipbtn on" id="brush-draw" data-ico="draw">Draw</button>
+      <button type="button" class="chipbtn" id="brush-erase" data-ico="erase">Erase</button>
+      <button type="button" class="chipbtn" id="brush-clear" data-ico="clear">Clear</button>
+      <button type="button" class="ibtn sun" id="btn-pop" data-ico="pop">Pop into 3D</button>
+    </div>
+  </section>
+
+  <section class="pane" data-pane="terrain">
+    <div class="row"><label>Biome</label></div>
+    <div class="swatches" id="biomes"></div>
+    <div class="row"><label>Land / water <span class="val" id="v-land">50</span></label><input id="p-land" type="range" min="0" max="100" value="50"></div>
+    <div class="row"><label>Craters <span class="val" id="v-craters">0</span></label><input id="p-craters" type="range" min="0" max="100" value="20"></div>
+    <div class="row"><label>Volcanoes <span class="val" id="v-volcanoes">0</span></label><input id="p-volcanoes" type="range" min="0" max="100" value="0"></div>
+    <div class="row"><label>Ice caps <span class="val" id="v-iceCaps">40</span></label><input id="p-iceCaps" type="range" min="0" max="100" value="40"></div>
+  </section>
+
+  <section class="pane" data-pane="sky">
+    <div class="row"><label>Clouds <span class="val" id="v-clouds">40</span></label><input id="p-clouds" type="range" min="0" max="100" value="40"></div>
+    <div class="row"><label>Cloud pattern</label></div>
+    <div class="presets" id="cloudpats"></div>
+    <div class="row"><label>Atmosphere <span class="val" id="v-atmo">50</span></label><input id="p-atmo" type="range" min="0" max="100" value="50"></div>
+    <div class="row"><label>Atmosphere color</label></div>
+    <div class="swatches" id="atmo-hues"></div>
+    <div class="row"><label>Aurora <span class="val" id="v-aurora">0</span></label><input id="p-aurora" type="range" min="0" max="100" value="0"></div>
+    <div class="row"><label>City lights <span class="val" id="v-city">0</span></label><input id="p-city" type="range" min="0" max="100" value="0"></div>
+    <div class="row"><label>Glow <span class="val" id="v-glow">0</span></label><input id="p-glow" type="range" min="0" max="100" value="0"></div>
+  </section>
+
+  <section class="pane" data-pane="rings">
+    <p class="help">Up to three rings. Each can have its own width, tilt, colour, banding and density.</p>
+    <div id="ring-list" class="card-list"></div>
+    <button type="button" class="ibtn" id="add-ring" data-ico="ring">Add a ring</button>
+  </section>
+
+  <section class="pane" data-pane="moons">
+    <p class="help">Up to three moons. Set each one's size, type, orbit distance and speed.</p>
+    <div id="moon-list" class="card-list"></div>
+    <button type="button" class="ibtn" id="add-moon" data-ico="moon">Add a moon</button>
+  </section>
+
+
+  <section class="pane" data-pane="paint">
+    <p class="help">Paint on the spinning planet. Your marks show in the solar system and tint the land when someone lands.</p>
+    <div class="row"><label>Color</label></div>
+    <div class="swatches" id="paint-pal"></div>
+    <div class="row"><label>Brush <span class="val" id="v-brush">medium</span></label></div>
+    <div class="presets" id="paint-brush">
+      <button type="button" data-brush="1" data-ico="draw">Fine</button>
+      <button type="button" class="on" data-brush="2" data-ico="draw">Medium</button>
+      <button type="button" data-brush="4" data-ico="draw">Broad</button>
+    </div>
+    <button type="button" class="ibtn" id="paint-clear" data-ico="clear">Clear paint</button>
+  </section>
+
+  <section class="pane" data-pane="note">
+    <div class="row"><label for="p-name">Planet name</label><input id="p-name" class="ink" maxlength="24" placeholder="a name for this planet" autocomplete="off"></div>
+    <div class="row"><label for="p-author">Signed, optional</label><input id="p-author" class="ink" maxlength="24" placeholder="signed, …" autocomplete="off"></div>
+    <div class="row"><label for="p-msg">A short message, optional</label>
+      <textarea id="p-msg" class="ink" rows="3" maxlength="160" placeholder="a note to whoever lands here…"></textarea>
+      <div class="count" id="msg-count">0/160</div>
+    </div>
+    <p class="note" id="note"></p>
+    <div class="presets">
+      <button type="button" class="ibtn" id="btn-rand" data-ico="rand">Randomize</button>
+    </div>
+    <div class="launch-wrap"><button type="button" class="ibtn sun" id="btn-launch" data-ico="launch">Launch into orbit</button></div>
+  </section>
+</aside>
+
+<div id="card" hidden>
+  <h2 id="c-title">Planet <span class="num" id="c-num">#1</span></h2>
+  <p class="when" id="c-when"></p>
+  <p class="from" id="c-from"></p>
+  <p class="body" id="c-body"></p>
+  <div class="actions">
+    <button type="button" class="ibtn sun" id="c-land" data-ico="land">Land</button>
+    <button type="button" class="ibtn" id="c-close" data-ico="back">Back</button>
+  </div>
+</div>
+
+<div id="surface-ui" hidden>
+  <div class="bar">
+    <button type="button" class="ibtn" id="s-leave" data-ico="leave">Leave</button>
+    <h2 id="s-title">Planet</h2>
+  </div>
+  <div class="tools" id="s-tools"></div>
+  <div id="pad">
+    <div class="side">
+      <button type="button" class="ibtn tbtn" id="pad-left" data-ico="left" aria-label="Left"></button>
+      <button type="button" class="ibtn tbtn" id="pad-right" data-ico="right" aria-label="Right"></button>
+    </div>
+    <div class="side">
+      <button type="button" class="ibtn tbtn sun" id="pad-jump" data-ico="jump" aria-label="Jump">jump</button>
+    </div>
+  </div>
+</div>
+
+<canvas id="ui-dust" aria-hidden="true"></canvas>
+<p class="toast" id="toast" role="status" aria-live="polite" hidden></p>
+<p id="hoverchip" hidden></p>
+
+<script src="assets/filter.js"></script>
+<script src="assets/core.js"></script>
+<script src="assets/store.js"></script>
+<script src="assets/planet.js"></script>
+<script src="assets/surface.js"></script>
+<script src="assets/sfx.js"></script>
+<script src="assets/music.js"></script>
+<script src="assets/ui.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+Background music
+Title:   Sunset Walk
+Artist:  KiluaBoy
+Source:  https://opengameart.org/content/sunset-walk-ambient-quiet-sweet-loop
+Licence: CC0 1.0 Universal (public domain dedication) - https://creativecommons.org/publicdomain/zero/1.0/
+         (licence listed on the source page; attribution not required, given here as a courtesy)
+Original file: SunsetWalk.ogg (1 m 16.8 s loop), https://opengameart.org/sites/default/files/SunsetWalk.ogg
+Changes: the original Ogg Vorbis is used as-is (sunset-walk.ogg). A 112 kbps MP3 (sunset-walk.mp3) was transcoded from that file for browsers that cannot play Ogg.
