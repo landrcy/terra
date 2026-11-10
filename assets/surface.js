@@ -427,7 +427,7 @@
       c0 = stops[Math.min(nStops - 1, a)];
       c1 = stops[Math.min(nStops - 1, a + 1)];
       for (x = 0; x < W; x++) {
-        var ff = T.clamp(f + (T.bayer(x, y) - 0.5) * 0.75, 0, 1);
+        var ff = f;
         var rr = (c0[0] + (c1[0] - c0[0]) * ff);
         var gg = (c0[1] + (c1[1] - c0[1]) * ff);
         var bb = (c0[2] + (c1[2] - c0[2]) * ff);
@@ -435,7 +435,7 @@
           var dist = Math.hypot(x - sunX, y - sunY);
           var bloom = T.clamp(1 - dist / bloomR, 0, 1);
           bloom = bloom * bloom;
-          if (bloom > 0.02 && T.bayer(x + 3, y) < 0.5 + bloom * 0.5) {
+          if (bloom > 0.01) {
             var bc = biome === 'lava' ? [255, 140, 40] : (biome === 'desert' ? [255, 220, 140] : [255, 248, 210]);
             var bk = bloom * 0.72;
             rr = rr * (1 - bk) + bc[0] * bk;
@@ -472,19 +472,36 @@
 
     /* sun — soft disk and corona; bloom already lives in the sky gradient */
     if (biome !== 'storm') {
-      var sc0 = biome === 'lava' ? '#ffb040' : '#fff8e0', sc1 = biome === 'desert' ? '#ffe08a' : '#ffe8b0', sc2 = biome === 'lava' ? '#e05018' : '#ffc070';
-      var breath = T.reduced ? 1 : (0.94 + 0.06 * Math.sin(t * 0.55));
-      for (y = -sr * 3; y <= sr * 3; y++) for (x = -sr * 3; x <= sr * 3; x++) {
-        var rr = Math.hypot(x, y), px = sunX + x, py = sunY + y;
+      var sc0 = T.hex(biome === 'lava' ? '#ffd070' : '#fff8e8');
+      var sc1 = T.hex(biome === 'desert' ? '#ffe08a' : '#ffe6a8');
+      var sc2 = T.hex(biome === 'lava' ? '#e05018' : '#ffb060');
+      var breath = T.reduced ? 1 : (0.96 + 0.04 * Math.sin(t * 0.45));
+      var cell = Math.max(3, sr * 0.28);
+      var img2 = ctx.getImageData(0, 0, W, H), d2 = img2.data;
+      var x0 = Math.max(0, (sunX - sr * 3) | 0), x1 = Math.min(W - 1, (sunX + sr * 3) | 0);
+      var y0 = Math.max(0, (sunY - sr * 3) | 0), y1 = Math.min(H - 1, (sunY + sr * 3) | 0);
+      for (y = y0; y <= y1; y++) for (x = x0; x <= x1; x++) {
+        var dx = x + 0.5 - sunX, dy = y + 0.5 - sunY, rr = Math.hypot(dx, dy);
+        var o = (y * W + x) * 4;
         if (rr <= sr) {
-          var nr = rr / sr, limb = Math.pow(T.clamp((nr - 0.72) / 0.28, 0, 1), 1.3);
-          ctx.fillStyle = nr < 0.5 ? sc0 : (limb > 0.45 ? sc2 : sc1);
-          ctx.fillRect(px, py, 1, 1);
+          var nr = rr / sr, nz = Math.sqrt(Math.max(0, 1 - nr * nr));
+          var g = T.fbm2(dx / cell, dy / cell, 11, 2);
+          var v = 0.35 + nz * 0.55 + (g - 0.5) * 0.08;
+          var col = v > 0.62 ? T.mix3(sc1, sc0, (v - 0.62) / 0.38) : T.mix3(sc2, sc1, v / 0.62);
+          var limb = Math.pow(T.clamp((nr - 0.72) / 0.28, 0, 1), 1.4);
+          if (limb > 0) col = T.mix3(col, sc2, limb * 0.55);
+          d2[o] = col[0] | 0; d2[o + 1] = col[1] | 0; d2[o + 2] = col[2] | 0; d2[o + 3] = 255;
         } else {
-          var fall = Math.pow(T.clamp(1 - (rr - sr) / (sr * 2.1), 0, 1), 2.2) * breath;
-          if (fall > 0.06) { ctx.fillStyle = sc2; ctx.globalAlpha = fall * 0.85; ctx.fillRect(px, py, 1, 1); ctx.globalAlpha = 1; }
+          var fall = Math.pow(T.clamp(1 - (rr - sr) / (sr * 2.15), 0, 1), 2.15) * breath;
+          if (fall > 0.01) {
+            var a = fall * 0.85;
+            d2[o] = (d2[o] * (1 - a) + sc2[0] * a) | 0;
+            d2[o + 1] = (d2[o + 1] * (1 - a) + sc2[1] * a) | 0;
+            d2[o + 2] = (d2[o + 2] * (1 - a) + sc2[2] * a) | 0;
+          }
         }
       }
+      ctx.putImageData(img2, 0, 0);
     }
 
     /* rings — big arc across the sky */

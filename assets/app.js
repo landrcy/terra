@@ -107,17 +107,6 @@
   }
   function drawStars() {
     var i, s, x, y, c, tw;
-    if (!T.reduced) {
-      for (y = (H * 0.28) | 0; y < (H * 0.62) | 0; y++) {
-        var band = 1 - Math.abs(y / H - 0.45) / 0.17;
-        for (x = 0; x < W; x++) {
-          if (T.bayer(x, y) < band * 0.12 * T.fbm2(x * 0.04, y * 0.05, 7, 3)) {
-            ctx.fillStyle = (x + y) % 5 ? '#3a2a28' : '#5a4038';
-            ctx.fillRect(x, y, 1, 1);
-          }
-        }
-      }
-    }
     for (i = 0; i < stars.length; i++) {
       s = stars[i];
       x = ((s.x * W + time * 1.2 * (s.b + 1) * 0.4) % W + W) % W;
@@ -126,7 +115,6 @@
       tw = 0.55 + 0.45 * Math.sin(time * (1.4 + s.ph) + s.ph);
       c = s.b === 0 ? '#5a4a40' : s.b === 1 ? '#c8b8a0' : (tw > 0.85 ? '#ffffff' : '#fff8e8');
       if (!T.reduced && s.b === 2 && tw < 0.28) continue;
-      if (s.band) { y = ((y * 0.35 + H * 0.4) | 0); c = s.b ? '#e8d8c0' : '#6a5a50'; }
       ctx.fillStyle = c;
       ctx.fillRect(x | 0, y, 1, 1);
       if (!T.reduced && s.b === 2 && tw > 0.9) {
@@ -149,45 +137,45 @@
       }
     }
   }
+  function mixRamp(ramp, v) {
+    v = T.clamp(v, 0, 1) * (ramp.length - 1);
+    var i = Math.min(ramp.length - 2, v | 0), t = v - i;
+    return T.mix3(T.hex(ramp[i]), T.hex(ramp[i + 1]), t);
+  }
   function drawSun(x, y, R) {
+    /* Smooth gradient disc + coarse granulation + soft bloom. No Bayer/dqc dither. */
     var img = ctx.getImageData(0, 0, W, H), d = img.data, i, j, o;
-    var ramp = ['#3a0800', '#7a1804', '#c43808', '#ee5a18', '#fa8a2c', '#ffc070', '#ffe8c0', '#fff8e8'];
-    var bloomR = ['#3a0602', '#8a1606', '#e04a12', '#ff9a30', '#ffe0a0', '#fff6e8'];
-    var reach = R * 2.45;
+    var ramp = ['#6a1404', '#c43808', '#ee5a18', '#fa8a2c', '#ffc070', '#ffe8c0', '#fff8e8'];
+    var bloomR = ['#4a0a04', '#a82008', '#ee5a18', '#ff9a30', '#ffe0a0'];
+    var reach = R * 2.55;
+    var cell = Math.max(3, R * 0.18);
     var x0 = Math.max(0, (x - reach) | 0), x1 = Math.min(W - 1, (x + reach) | 0);
     var y0 = Math.max(0, (y - reach) | 0), y1 = Math.min(H - 1, (y + reach) | 0);
-    var breath = T.reduced ? 1 : (0.94 + 0.06 * Math.sin(time * 0.55));
+    var breath = T.reduced ? 1 : (0.96 + 0.04 * Math.sin(time * 0.45));
     for (j = y0; j <= y1; j++) for (i = x0; i <= x1; i++) {
       var dx = i + 0.5 - x, dy = j + 0.5 - y, r = Math.hypot(dx, dy), ang = Math.atan2(dy, dx);
       o = (j * W + i) * 4;
       if (r <= R) {
         var nr = r / R, nz = Math.sqrt(Math.max(0, 1 - nr * nr));
-        var g = T.fbm2((ang + time * 0.05) * 3.1, nz * 3.4 + time * 0.04, 9, 4);
-        var v = 0.30 + Math.pow(nz, 0.55) * 0.60 + (g - 0.5) * 0.16;
-        var spot = T.fbm2(ang * 2.1, nz * 5 + time * 0.02, 21, 3);
-        if (spot < 0.32 && nz > 0.28 && nz < 0.82) v -= (0.32 - spot) * 0.45;
-        if (g > 0.76 && nz > 0.48) v += 0.07;
-        var col = T.dqc(ramp, T.clamp(v, 0, 1), i, j);
-        /* soft limb — fade the hard disk edge into the bloom */
-        var limb = Math.pow(T.clamp((nr - 0.78) / 0.22, 0, 1), 1.35);
+        /* large, gentle cells — 2 octaves at cell scale, not per-pixel noise */
+        var g = T.fbm2(dx / cell + time * 0.03, dy / cell, 9, 2);
+        var v = 0.36 + Math.pow(nz, 0.72) * 0.56 + (g - 0.5) * 0.10;
+        var col = mixRamp(ramp, v);
+        var limb = Math.pow(T.clamp((nr - 0.72) / 0.28, 0, 1), 1.45);
         if (limb > 0) {
-          var lc = T.dqc(bloomR, 0.55 + (1 - limb) * 0.3, i, j);
-          col = [
-            (col[0] * (1 - limb) + lc[0] * limb) | 0,
-            (col[1] * (1 - limb) + lc[1] * limb) | 0,
-            (col[2] * (1 - limb) + lc[2] * limb) | 0
-          ];
+          var lc = mixRamp(bloomR, 0.62 + (1 - limb) * 0.22);
+          col = T.mix3(col, lc, limb);
         }
-        d[o] = col[0]; d[o + 1] = col[1]; d[o + 2] = col[2]; d[o + 3] = 255;
+        d[o] = col[0] | 0; d[o + 1] = col[1] | 0; d[o + 2] = col[2] | 0; d[o + 3] = 255;
       }
-      if (r > R * 0.88 && r < reach) {
-        var u = (r - R * 0.88) / (reach - R * 0.88);
-        var fall = Math.pow(1 - T.clamp(u, 0, 1), 2.35);
-        var und = T.reduced ? 1 : (0.88 + 0.12 * T.fbm2(ang * 1.35 + time * 0.12, r * 0.015, 5, 3));
+      if (r > R * 0.82 && r < reach) {
+        var u = (r - R * 0.82) / (reach - R * 0.82);
+        var fall = Math.pow(1 - T.clamp(u, 0, 1), 2.15);
+        var und = T.reduced ? 1 : (0.94 + 0.06 * Math.sin(ang * 3 + time * 0.35) * Math.pow(1 - u, 1.2));
         var cv = fall * breath * und;
-        if (cv > 0.012) {
-          var bc = T.dqc(bloomR, T.clamp(0.15 + cv * 0.85, 0, 1), i, j);
-          var a = T.clamp(cv * (r <= R ? 0.35 : 0.92), 0, 1);
+        if (cv > 0.01) {
+          var bc = mixRamp(bloomR, T.clamp(0.18 + cv * 0.72, 0, 1));
+          var a = T.clamp(cv * (r <= R ? 0.28 : 0.90), 0, 1);
           d[o] = (d[o] * (1 - a) + bc[0] * a) | 0;
           d[o + 1] = (d[o + 1] * (1 - a) + bc[1] * a) | 0;
           d[o + 2] = (d[o + 2] * (1 - a) + bc[2] * a) | 0;
