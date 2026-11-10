@@ -3,7 +3,8 @@
   'use strict';
   var T = window.TERRA, TAU = T.TAU;
   var canvas, ctx, scale = 3, W = 320, H = 180;
-  var mode = 'title', last = 0, time = 0;
+  var mode = 'boot', last = 0, time = 0;
+  var bootFX = { t: 0, ready: 0, done: 0, dust: null };
   var spec = T.defaultSpec((Math.random() * 0xffffffff) | 0);
   var mask = T.planet.circleMask(T.SHAPE_N), inflate = 1, popT = -1, popFrom = 0;
   var planets = [], store = null, cam = { x: 0, y: 0, z: 1 }, drag = null, pinch = null;
@@ -149,38 +150,50 @@
     }
   }
   function drawSun(x, y, R) {
-    var img = ctx.getImageData(0, 0, W, H), d = img.data, i, j, k;
-    var ramp = ['#3a0800', '#7a1804', '#c43808', '#ee5a18', '#fa8a2c', '#ffc070', '#ffe8c0', '#fff6e0'];
-    var reach = R * SUN_CORONA;
+    var img = ctx.getImageData(0, 0, W, H), d = img.data, i, j, o;
+    var ramp = ['#3a0800', '#7a1804', '#c43808', '#ee5a18', '#fa8a2c', '#ffc070', '#ffe8c0', '#fff8e8'];
+    var bloomR = ['#3a0602', '#8a1606', '#e04a12', '#ff9a30', '#ffe0a0', '#fff6e8'];
+    var reach = R * 2.45;
     var x0 = Math.max(0, (x - reach) | 0), x1 = Math.min(W - 1, (x + reach) | 0);
     var y0 = Math.max(0, (y - reach) | 0), y1 = Math.min(H - 1, (y + reach) | 0);
+    var breath = T.reduced ? 1 : (0.94 + 0.06 * Math.sin(time * 0.55));
     for (j = y0; j <= y1; j++) for (i = x0; i <= x1; i++) {
-      var dx = i + 0.5 - x, dy = j + 0.5 - y, r = Math.hypot(dx, dy), col = null, ang = Math.atan2(dy, dx);
+      var dx = i + 0.5 - x, dy = j + 0.5 - y, r = Math.hypot(dx, dy), ang = Math.atan2(dy, dx);
+      o = (j * W + i) * 4;
       if (r <= R) {
-        var nz = Math.sqrt(Math.max(0, 1 - (r / R) * (r / R)));
-        var g = T.fbm2((ang + time * 0.07) * 4, nz * 5, 9, 4);
-        var v = 0.18 + nz * 0.58 + (g - 0.5) * 0.34;
-        /* sunspots */
-        var spot = T.fbm2(ang * 2.2, nz * 6 + time * 0.02, 21, 3);
-        if (spot < 0.34 && nz > 0.25 && nz < 0.85) v -= (0.34 - spot) * 0.7;
-        /* faculae */
-        if (g > 0.72 && nz > 0.45) v += 0.12;
-        col = T.dqc(ramp, T.clamp(v, 0, 1), i, j);
-      } else if (r < R * 1.7) {
-        var cv = 1 - (r - R) / (R * 0.7);
-        if (cv * 0.78 > T.bayer(i, j) * 0.9 + 0.05) col = T.dqc(['#4a0803', '#8a1606', '#c42a0a', '#ff8a1e', '#ffc070'], cv, i, j);
-      }
-      if (!col && r < R * SUN_CORONA) {
-        var flare = 0;
-        for (k = 0; k < 10; k++) {
-          var fa = k * Math.PI / 5 + Math.sin(time * 0.32 + k) * 0.1;
-          var da = Math.abs(Math.atan2(Math.sin(ang - fa), Math.cos(ang - fa)));
-          var fw = 0.07 + 0.05 * (k % 2);
-          if (da < fw) flare = Math.max(flare, (1 - da / fw) * (1 - (r - R) / (R * 1.15)));
+        var nr = r / R, nz = Math.sqrt(Math.max(0, 1 - nr * nr));
+        var g = T.fbm2((ang + time * 0.05) * 3.1, nz * 3.4 + time * 0.04, 9, 4);
+        var v = 0.30 + Math.pow(nz, 0.55) * 0.60 + (g - 0.5) * 0.16;
+        var spot = T.fbm2(ang * 2.1, nz * 5 + time * 0.02, 21, 3);
+        if (spot < 0.32 && nz > 0.28 && nz < 0.82) v -= (0.32 - spot) * 0.45;
+        if (g > 0.76 && nz > 0.48) v += 0.07;
+        var col = T.dqc(ramp, T.clamp(v, 0, 1), i, j);
+        /* soft limb — fade the hard disk edge into the bloom */
+        var limb = Math.pow(T.clamp((nr - 0.78) / 0.22, 0, 1), 1.35);
+        if (limb > 0) {
+          var lc = T.dqc(bloomR, 0.55 + (1 - limb) * 0.3, i, j);
+          col = [
+            (col[0] * (1 - limb) + lc[0] * limb) | 0,
+            (col[1] * (1 - limb) + lc[1] * limb) | 0,
+            (col[2] * (1 - limb) + lc[2] * limb) | 0
+          ];
         }
-        if (flare > T.bayer(i, j) * 0.85 + 0.12) col = T.dqc(['#7a1804', '#ee5a18', '#ffc070'], flare, i, j);
+        d[o] = col[0]; d[o + 1] = col[1]; d[o + 2] = col[2]; d[o + 3] = 255;
       }
-      if (col) { var o = (j * W + i) * 4; d[o] = col[0]; d[o + 1] = col[1]; d[o + 2] = col[2]; d[o + 3] = 255; }
+      if (r > R * 0.88 && r < reach) {
+        var u = (r - R * 0.88) / (reach - R * 0.88);
+        var fall = Math.pow(1 - T.clamp(u, 0, 1), 2.35);
+        var und = T.reduced ? 1 : (0.88 + 0.12 * T.fbm2(ang * 1.35 + time * 0.12, r * 0.015, 5, 3));
+        var cv = fall * breath * und;
+        if (cv > 0.012) {
+          var bc = T.dqc(bloomR, T.clamp(0.15 + cv * 0.85, 0, 1), i, j);
+          var a = T.clamp(cv * (r <= R ? 0.35 : 0.92), 0, 1);
+          d[o] = (d[o] * (1 - a) + bc[0] * a) | 0;
+          d[o + 1] = (d[o + 1] * (1 - a) + bc[1] * a) | 0;
+          d[o + 2] = (d[o + 2] * (1 - a) + bc[2] * a) | 0;
+          if (d[o + 3] < 255) d[o + 3] = 255;
+        }
+      }
     }
     ctx.putImageData(img, 0, 0);
   }
@@ -192,7 +205,7 @@
   }
 
   /* ---------- orbits ---------- */
-  var SUN_WORLD = 96, VIEW_R = 26, ORBIT_ASPECT = 0.46, SUN_CORONA = 1.72;
+  var SUN_WORLD = 96, VIEW_R = 26, ORBIT_ASPECT = 0.46, SUN_CORONA = 1.85;
   var TINT = { ocean: '#3a8ab0', forest: '#3e8a30', garden: '#6aba50', desert: '#c4944c', tundra: '#6a8098', ice: '#88b0d0', lava: '#e05020', storm: '#8a7aa0' };
   function planetTint(p) {
     var b = (p && p.biome) || 'forest';
@@ -706,7 +719,7 @@
       ctx.translate(cx, cy); ctx.scale(k, k); ctx.translate(-cx, -cy);
     }
     if (popT >= 0 && inflate < 0.2) T.planet.flatDraw(ctx, cx, cy, R, spec, mask);
-    else T.planet.draw(ctx, cx, cy, R, spec, time, [-0.62, -0.4, 0.66], { live: true, inflate: inflate < 1 ? inflate : undefined });
+    else T.planet.draw(ctx, cx, cy, R, spec, time, [-0.62, -0.4, 0.66], { live: true, inflate: inflate < 1 ? inflate : undefined, rot: L.rot });
     ctx.restore();
   }
 
@@ -828,6 +841,66 @@
     return x;
   }
 
+  function drawBoot(dt) {
+    bootFX.t += dt;
+    var t = bootFX.t, cx = (W / 2) | 0, cy = Math.round(H * 0.52);
+    var forceBoot = /[?&]boot=1\b/.test(location.search);
+    var minT = (!motionOk() || (isPreviewLocal() && !forceBoot)) ? 0.25 : 2.2, maxT = 5;
+    var form = T.clamp((t - (motionOk() ? 0.12 : 0)) / (motionOk() ? 1.35 : 0.01), 0, 1);
+    form = form * form * (3 - 2 * form);
+    if (!bootFX.dust) {
+      bootFX.dust = [];
+      var i;
+      for (i = 0; i < 90; i++) bootFX.dust.push({ a: Math.random() * TAU, r: 28 + Math.random() * 100, s: 0.35 + Math.random(), k: Math.random() });
+    }
+    if (motionOk() && form < 0.98) {
+      bootFX.dust.forEach(function (p) {
+        var rr = p.r * (1 - form * 0.88);
+        var ang = p.a + t * (0.7 + p.s);
+        var x = cx + Math.cos(ang) * rr, y = cy + Math.sin(ang) * rr * 0.7;
+        var a = T.clamp(1 - form * 0.7, 0, 1);
+        if (a > 0.08 && T.bayer(x | 0, y | 0) < a + 0.2) {
+          ctx.fillStyle = p.k < 0.3 ? '#fff6e0' : (p.k < 0.65 ? '#e8c878' : '#8a6a40');
+          ctx.fillRect(x | 0, y | 0, 1, 1);
+        }
+      });
+    }
+    if (form > 0.04 && titleSpec) {
+      var viewR = Math.min(W, H) * (0.10 + form * 0.14);
+      T.planet.draw(ctx, cx, cy, viewR, titleSpec, t, [-0.62, -0.4, 0.66], { live: true, rot: motionOk() ? Math.sin(t * 0.7) * 0.28 : 0 });
+    }
+    var logoT = T.clamp((t - (motionOk() ? 0.7 : 0)) / (motionOk() ? 1.05 : 0.01), 0, 1);
+    logoT = logoT * logoT * (3 - 2 * logoT);
+    if (logoT > 0) {
+      var lh = Math.max(22, Math.min(34, (H * 0.2) | 0));
+      var yOff = motionOk() ? Math.round((1 - logoT) * (lh + 10)) : 0;
+      drawTerraLogo((W / 2) | 0, Math.max(8, ((H * 0.08) | 0)) + yOff, lh, t);
+    }
+    var barW = Math.min(W - 28, 170), barH = 7, bx = ((W - barW) / 2) | 0, by = H - 20;
+    var prog = T.clamp(t / 2.5, 0, 0.86);
+    if (bootFX.ready) prog = Math.max(prog, T.clamp(0.86 + (t - minT) * 0.4, 0.86, 1));
+    prog = Math.max(prog, T.clamp(t / maxT, 0, 1));
+    var layers = ['#2a1a10', '#5a3820', '#3a5a30', '#c4a05a'], x, li;
+    ctx.fillStyle = 'rgba(8,10,16,0.55)';
+    ctx.fillRect(bx - 2, by - 2, barW + 4, barH + 4);
+    ctx.fillStyle = 'rgba(210,220,245,0.45)';
+    ctx.fillRect(bx - 2, by - 2, barW + 4, 1);
+    ctx.fillRect(bx - 2, by + barH + 1, barW + 4, 1);
+    ctx.fillRect(bx - 2, by - 2, 1, barH + 4);
+    ctx.fillRect(bx + barW + 1, by - 2, 1, barH + 4);
+    var filled = (barW * prog) | 0;
+    for (x = 0; x < filled; x++) {
+      li = Math.min(layers.length - 1, (x / Math.max(1, barW / layers.length)) | 0);
+      ctx.fillStyle = layers[li];
+      ctx.fillRect(bx + x, by, 1, barH);
+    }
+    if (((t >= minT && bootFX.ready) || t >= maxT) && !bootFX.done) {
+      bootFX.done = 1;
+      if ($('music-btn')) $('music-btn').hidden = false;
+      applyMode('title');
+    }
+  }
+
   function loop(now) {
     var dt = Math.min(0.05, (now - last) / 1000); last = now; time += dt;
     if (popT >= 0) {
@@ -844,7 +917,8 @@
     ctx.fillStyle = '#120e0c';
     ctx.fillRect(0, 0, W, H);
     if (mode !== 'surface') drawStars();
-    if (mode === 'title') drawTitle();
+    if (mode === 'boot') drawBoot(dt);
+    else if (mode === 'title') drawTitle();
     else if (mode === 'builder') drawBuilder();
     else if (mode === 'launch') drawLaunch(dt);
     else if (mode === 'system' || mode === 'inspect') drawSystem();
@@ -871,7 +945,8 @@
       ext = T.planet.maxExtent(fitSpec, mid);
       if (ext <= budget) lo = mid; else hi = mid;
     }
-    return { cx: Math.round(cx), cy: Math.round(cy), viewR: lo, bodyR: T.planet.bodyRadius(lo, spec.size), rot: time * (T.reduced ? 0.12 : 0.28) };
+    var wob = T.reduced ? 0 : Math.sin(time * 0.85) * (25 * Math.PI / 180);
+    return { cx: Math.round(cx), cy: Math.round(cy), viewR: lo, bodyR: T.planet.bodyRadius(lo, spec.size), rot: wob };
   }
   function tryPaintAt(sx, sy) {
     var L = builderLayout(), uv = T.planet.pickUV(sx, sy, L.cx, L.cy, L.bodyR, L.rot);
@@ -947,9 +1022,14 @@
     spec = T.blankSpec(0x51a7e0);
     mask = T.planet.circleMask(T.SHAPE_N); spec.shape = null; spec.shapeKind = null;
     fillChoices(); fillPaint(); bindDynamic(); syncFromSpec(); syncMusic();
-    showMode('title');
+    if ($('title-ui')) $('title-ui').hidden = true;
+    if ($('music-btn')) $('music-btn').hidden = true;
+    if ($('music-credit')) $('music-credit').hidden = true;
+    last = performance.now();
+    requestAnimationFrame(loop);
     store = T.openStore();
-    await loadPlanets();
+    try { await loadPlanets(); } catch (e) {}
+    bootFX.ready = 1;
 
     $('music-btn').addEventListener('click', function () { T.music.toggle(); syncMusic(); if (T.sfx) T.sfx.click(); });
     function startNewPlanet() {
@@ -1206,8 +1286,6 @@
       get cam() { return cam; },
       zoomAt: camZoomAt
     };
-    last = performance.now();
-    requestAnimationFrame(loop);
     setInterval(function () { if (mode === 'system' || mode === 'inspect') loadPlanets(); }, 20000);
   }
 

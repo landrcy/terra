@@ -16,7 +16,7 @@
 <meta name="music-credit" content="Music: Sunset Walk by KiluaBoy (CC0 1.0) — https://opengameart.org/content/sunset-walk-ambient-quiet-sweet-loop">
 <meta name="sfx-credit" content="Sound effects: Kenney.nl Interface, Sci-Fi, Impact and Digital Audio packs (CC0), www.kenney.nl">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/style.css?v=2">
 </head>
 <body>
 <canvas id="view" aria-hidden="true"></canvas>
@@ -50,13 +50,14 @@
 
   <section class="pane on" data-pane="body">
     <div class="row"><label>Size <span class="val" id="v-size">medium</span></label><input id="p-size" type="range" min="0" max="100" value="50"></div>
-    <p class="help">Draw a silhouette, then pop it into 3D. It will spin as a little planet.</p>
+    <p class="help">Draw a silhouette, then pop it into 3D. It will turn in 3D as a little planet.</p>
     <div class="presets" id="shape-presets">
       <button type="button" class="on" data-shape="sphere" data-ico="sphere">Sphere</button>
       <button type="button" data-shape="heart" data-ico="heart">Heart</button>
       <button type="button" data-shape="pear" data-ico="pear">Pear</button>
       <button type="button" data-shape="bean" data-ico="bean">Bean</button>
       <button type="button" data-shape="diamond" data-ico="gem">Diamond</button>
+      <button type="button" data-shape="square" data-ico="square">Square</button>
     </div>
     <canvas id="drawbox" width="48" height="48" style="width:192px;height:192px" aria-label="Draw a 2D silhouette"></canvas>
     <div class="presets">
@@ -169,14 +170,14 @@
 </div>
 <p id="hoverchip" hidden></p>
 
-<script src="assets/filter.js"></script>
-<script src="assets/core.js"></script>
-<script src="assets/store.js"></script>
-<script src="assets/planet.js"></script>
-<script src="assets/surface.js"></script>
-<script src="assets/sfx.js"></script>
-<script src="assets/music.js"></script>
-<script src="assets/ui.js"></script>
-<script src="assets/app.js"></script>
+<script src="assets/filter.js?v=2"></script>
+<script src="assets/core.js?v=2"></script>
+<script src="assets/store.js?v=2"></script>
+<script src="assets/planet.js?v=2"></script>
+<script src="assets/surface.js?v=2"></script>
+<script src="assets/sfx.js?v=2"></script>
+<script src="assets/music.js?v=2"></script>
+<script src="assets/ui.js?v=2"></script>
+<script src="assets/app.js?v=2"></script>
 </body>
 </html>

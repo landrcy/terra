@@ -208,6 +208,7 @@
           col = T.bayer(x, y) < 0.55 ? [255, 220, 110] : [255, 150, 50];
         }
         if (r2 > Math.pow(1 - 1.6 / R, 2) && dx * lx + dy * ly > 0.35 && lit > 0.5) col = col.map(function (v) { return Math.min(255, Math.round(v * 1.16 + 20)); });
+        col = shadeByRingShadow(col, ringShadowK(dx * R, dy * R, nz * R, R, spec, light));
       } else {
         var e = (Math.sqrt(r2) - 1) * R;
         if (e < glowW) {
@@ -265,24 +266,28 @@
     return Math.sqrt(Math.min(d0, d1, d2v)) * (inside ? -1 : 1);
   }
   function sdHeart(x, y) {
-    var px = x * 1.08, py = y * 1.05 + 0.08;
-    var lobeR = 0.44, ox = 0.355, oy = 0.34;
-    var L = sdCircle(px, py, -ox, oy, lobeR);
-    var R = sdCircle(px, py, ox, oy, lobeR);
-    var body = sdTriangle(px, py, -0.78, 0.16, 0.78, 0.16, 0, -0.96);
-    return smin(smin(L, R, 0.07), body, 0.1);
+    /* Overlapping lobes (a clear V cleft at their upper intersection) blended
+       into a pointed triangle whose top sits at the chest, not in the cleft. */
+    var px = x * 1.12, py = y * 1.02 + 0.08;
+    var ox = 0.27, oy = 0.34, r = 0.44;
+    var L = sdCircle(px, py, -ox, oy, r);
+    var Rg = sdCircle(px, py, ox, oy, r);
+    var lobes = Math.min(L, Rg);
+    var body = sdTriangle(px, py, -0.70, 0.08, 0.70, 0.08, 0.0, -0.98);
+    return smin(lobes, body, 0.11);
   }
   function sdPear(x, y) {
-    var px = x * 1.08, py = y * 1.02;
-    var bot = sdEllipse(px, py, 0, -0.22, 0.64, 0.7);
-    var top = sdEllipse(px, py, 0, 0.42, 0.36, 0.44);
-    return smin(bot, top, 0.2);
+    var px = x * 1.10, py = y * 1.0 + 0.02;
+    var bot = sdEllipse(px, py, 0, -0.22, 0.66, 0.70);
+    var top = sdEllipse(px, py, 0, 0.40, 0.40, 0.44);
+    return smin(bot, top, 0.22);
   }
   function sdBean(x, y) {
-    var e1 = sdEllipse(x, y, -0.1, 0.06, 0.6, 0.74);
-    var e2 = sdEllipse(x, y, 0.2, -0.14, 0.5, 0.62);
-    var body = smin(e1, e2, 0.18);
-    var cut = sdCircle(x, y, 0.66, 0.14, 0.44);
+    /* Kidney: a squat oval with a shallow bite on one long side, slightly turned. */
+    var ca = 0.9397, sa = 0.3420; /* ~20° */
+    var px = x * ca + y * sa, py = -x * sa + y * ca;
+    var body = sdEllipse(px, py, 0.02, 0, 0.86, 0.58);
+    var cut = sdCircle(px, py, 1.18, 0.06, 0.50);
     return smax(body, -cut, 0.14);
   }
   function sdDiamond(x, y) {
@@ -291,7 +296,13 @@
     var nd = (px / w + py / h - 1) * (w * h) / Math.hypot(h, w);
     return nd - 0.035;
   }
-  var SHAPE_SDF = { heart: sdHeart, pear: sdPear, bean: sdBean, diamond: sdDiamond };
+  function sdSquare(x, y) {
+    var b = 0.70, r = 0.06;
+    var px = Math.abs(x) - b + r, py = Math.abs(y) - b + r;
+    var ax = Math.max(px, 0), ay = Math.max(py, 0);
+    return Math.hypot(ax, ay) + Math.min(Math.max(px, py), 0) - r;
+  }
+  var SHAPE_SDF = { heart: sdHeart, pear: sdPear, bean: sdBean, diamond: sdDiamond, square: sdSquare };
   P.shapeSdf = function (kind, x, y) {
     var fn = SHAPE_SDF[kind];
     return fn ? fn(x, y) : Math.hypot(x, y) - 1;
@@ -448,6 +459,7 @@
         if (T.bayer(x, y) < (map.C[ci] / 255)) col = shade(cc, lit, x, y, 0, rim * 0.6);
       }
       if (sm.land && spec.city > 0 && lit < 0.28 && map.L[sm.idx] > 70 && T.hash(x, y, spec.seed) < map.L[sm.idx] / 320) col = [255, 214, 96];
+      col = shadeByRingShadow(col, ringShadowK(x + 0.5 - cx, y + 0.5 - cy, hz * sc, R, spec, light));
       var o = (y * W + x) * 4; d[o] = col[0]; d[o + 1] = col[1]; d[o + 2] = col[2]; d[o + 3] = 255;
     }
     /* atmosphere: dilate only the true silhouette */
@@ -487,29 +499,96 @@
     for (i = 0; i < spec.rings.length; i++) m = Math.max(m, 1.05 + spec.rings[i].outer * 1.35);
     return m;
   }
-  function paintRings(img, cx, cy, R, spec, light, behind) {
+  function ringBounds(R, rg) {
+    var inn = R * (1.12 + rg.inner * 0.9), out = R * (1.2 + rg.outer * 1.35);
+    if (out <= inn) out = inn + 3;
+    return { inn: inn, out: out, tilt: rg.tilt * 0.85 };
+  }
+  function ringGap(u, band, seed, i) {
+    /* Saturn-like divisions: a wide Cassini gap plus finer Encke-like slits */
+    var g = 0.12 + band * 0.08;
+    if (Math.abs(u - 0.38) < g * 0.55) return 1;
+    if (Math.abs(u - 0.72) < g * 0.22) return 1;
+    if (Math.abs(u - 0.16) < g * 0.12) return 1;
+    if (band > 0.15 && Math.abs(Math.sin((u + i * 0.07) * (6 + band * 7) * Math.PI)) < 0.08 + band * 0.06) return 1;
+    return 0;
+  }
+  function ringPlaneHit(px, py, pz, lx, ly, lz, tilt) {
+    var sa = Math.sin(tilt), ca = Math.cos(tilt);
+    var den = ly * ca - lz * sa;
+    if (Math.abs(den) < 1e-5) return null;
+    var t = -(py * ca - pz * sa) / den;
+    if (t <= 0.4) return null;
+    var hx = px + lx * t, hy = py + ly * t, hz = pz + lz * t;
+    var rr = Math.hypot(hx, hy * sa + hz * ca);
+    return { rr: rr, t: t, x: hx, y: hy, z: hz };
+  }
+  function ringShadowK(px, py, pz, R, spec, light) {
+    if (!spec.rings || !spec.rings.length) return 0;
+    var lx = light[0], ly = light[1], lz = light[2], i, rg, b, hit, k = 0, u;
+    var len = Math.hypot(lx, ly, lz) || 1;
+    lx /= len; ly /= len; lz /= len;
+    for (i = 0; i < spec.rings.length; i++) {
+      rg = spec.rings[i]; b = ringBounds(R, rg);
+      hit = ringPlaneHit(px, py, pz, lx, ly, lz, b.tilt);
+      if (!hit || hit.rr < b.inn || hit.rr > b.out) continue;
+      u = (hit.rr - b.inn) / (b.out - b.inn);
+      if (ringGap(u, rg.banding, spec.seed, i)) continue;
+      k = Math.max(k, 0.55 + rg.density * 0.35);
+    }
+    return k;
+  }
+  function planetUmbraOnRing(px, py, pz, R, light) {
+    var lx = light[0], ly = light[1], lz = light[2];
+    var llen = Math.hypot(lx, ly, lz) || 1;
+    lx /= llen; ly /= llen; lz /= llen;
+    var mid = px * lx + py * ly + pz * lz;
+    if (mid >= 0) return 0;
+    var cx = px - mid * lx, cy = py - mid * ly, cz = pz - mid * lz;
+    var rad = Math.hypot(cx, cy, cz);
+    if (rad >= R * 0.98) return 0;
+    return T.clamp((R * 0.98 - rad) / (R * 0.18), 0, 1);
+  }
+  function shadeByRingShadow(col, k) {
+    if (k <= 0.02) return col;
+    var m = 1 - 0.62 * k;
+    return [Math.round(col[0] * m), Math.round(col[1] * m * 0.96), Math.round(col[2] * m * 0.9)];
+  }
+  function paintRings(img, cx, cy, R, spec, light, behind, t) {
     if (!spec.rings || !spec.rings.length) return;
+    t = t || 0;
     var W = img.width, H = img.height, d = img.data, i, x, y;
     for (i = 0; i < spec.rings.length; i++) {
-      var rg = spec.rings[i], tilt = rg.tilt * 0.85, inn = R * (1.12 + rg.inner * 0.9), out = R * (1.2 + rg.outer * 1.35);
-      if (out <= inn) out = inn + 3;
-      var pal = RINGPAL[rg.color] || RINGPAL.gold, dens = rg.density, band = rg.banding;
-      var yb = Math.max(0, (cy - out * (0.25 + Math.abs(tilt) * 0.9) - 2) | 0), ye = Math.min(H - 1, (cy + out * (0.25 + Math.abs(tilt) * 0.9) + 2) | 0);
+      var rg = spec.rings[i], b = ringBounds(R, rg), tilt = b.tilt, inn = b.inn, out = b.out;
+      var pal = RINGPAL[rg.color] || RINGPAL.gold, sa = Math.sin(tilt), ca = Math.cos(tilt);
+      var yReach = out * (Math.abs(sa) + 0.08) + 3;
+      var yb = Math.max(0, (cy - yReach) | 0), ye = Math.min(H - 1, (cy + yReach) | 0);
       var xb = Math.max(0, (cx - out - 2) | 0), xe = Math.min(W - 1, (cx + out + 2) | 0);
+      var spin = t * 0.12 + i * 0.4;
       for (y = yb; y <= ye; y++) for (x = xb; x <= xe; x++) {
         var dx = x + 0.5 - cx, dy = y + 0.5 - cy;
-        var ey = dy / Math.max(0.18, 0.28 + Math.abs(tilt) * 0.7);
-        var rr = Math.hypot(dx, ey);
+        if (Math.abs(sa) < 0.04) {
+          if (Math.abs(dy) > 2.2) continue;
+        }
+        var rr = Math.hypot(dx, (Math.abs(sa) > 0.04) ? dy / sa : 0);
         if (rr < inn || rr > out) continue;
-        var front = dy > 0;
+        var sinth = (Math.abs(sa) > 0.04) ? (-dy / (sa * rr)) : 0;
+        sinth = T.clamp(sinth, -1, 1);
+        var z = ca * rr * sinth;
+        var front = z > 0;
         if (behind && front) continue;
         if (!behind && !front) continue;
         var u = (rr - inn) / (out - inn);
-        if (band > 0.08 && Math.abs(Math.sin(u * (3 + band * 8) * Math.PI)) < band * 0.28) continue;
-        if (T.bayer(x, y) > dens * 0.92 + 0.05) continue;
-        var lit = 0.45 + 0.55 * Math.max(0, (dx / (out || 1)) * light[0] + 0.3);
-        if (T.hash(x, y + i * 3, spec.seed) > 0.14 + dens * 0.7) continue;
-        var col = T.dqc(pal, u * 0.7 + lit * 0.3, x, y);
+        if (ringGap(u, rg.banding, spec.seed, i)) continue;
+        var th = Math.atan2(sinth, dx / (rr || 1)) + spin;
+        var bandv = 0.5 + 0.5 * Math.sin((u * (9 + rg.banding * 14) + th * 0.35) * Math.PI);
+        var shimmer = 0.5 + 0.5 * Math.sin(th * 11 + t * 3.2 + u * 18);
+        if (T.reduced) shimmer = 0.5;
+        var lit = 0.42 + 0.58 * Math.max(0, (dx / (out || 1)) * light[0] + 0.22 * light[2] + 0.2);
+        var umbra = planetUmbraOnRing(dx, dy, z, R, light);
+        lit *= 1 - 0.72 * umbra;
+        var v = T.clamp(u * 0.55 + lit * 0.32 + bandv * 0.16 + (shimmer - 0.5) * 0.08, 0, 1);
+        var col = T.dqc(pal, v, x, y);
         var o = (y * W + x) * 4;
         if (!behind && d[o + 3] > 128) continue;
         d[o] = col[0]; d[o + 1] = col[1]; d[o + 2] = col[2]; d[o + 3] = 255;
@@ -569,11 +648,93 @@
 
   P.bodyRadius = function (viewR, size) { return Math.max(6, Math.round(viewR * (0.62 + size * 0.5))); };
 
+  function sdRoundBox3(px, py, pz, b, r) {
+    var qx = Math.abs(px) - b + r, qy = Math.abs(py) - b + r, qz = Math.abs(pz) - b + r;
+    var ax = Math.max(qx, 0), ay = Math.max(qy, 0), az = Math.max(qz, 0);
+    return Math.hypot(ax, ay, az) + Math.min(Math.max(qx, qy, qz), 0) - r;
+  }
+  function paintCube(img, cx, cy, R, spec, map, rot, light, t) {
+    var W = img.width, H = img.height, d = img.data;
+    var yaw = 0.62 + rot * 0.45, pitch = 0.48;
+    var cyaw = Math.cos(yaw), syaw = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
+    var half = R * 0.70, bev = Math.max(1.4, half * 0.1);
+    var lx = light[0], ly = light[1], lz = light[2];
+    function c2o(x, y, z) {
+      var y1 = y * cp + z * sp, z1 = -y * sp + z * cp;
+      return [x * cyaw + z1 * syaw, y1, -x * syaw + z1 * cyaw];
+    }
+    function o2c(x, y, z) {
+      var x1 = x * cyaw - z * syaw, z1 = x * syaw + z * cyaw;
+      return [x1, y * cp - z1 * sp, y * sp + z1 * cp];
+    }
+    var reach = half * 1.6 + 2;
+    var x0 = Math.max(0, (cx - reach) | 0), x1 = Math.min(W - 1, (cx + reach) | 0);
+    var y0 = Math.max(0, (cy - reach) | 0), y1 = Math.min(H - 1, (cy + reach) | 0);
+    var x, y, ts, p, s, n, i, e, col, sm, u, v, lon, lat, raw, lit, rim, sh, o, hx, hy, hz;
+    var zFar = half * 2.2, zNear = -half * 2.2, steps = 48;
+    for (y = y0; y <= y1; y++) for (x = x0; x <= x1; x++) {
+      var sx = x + 0.5 - cx, sy = y + 0.5 - cy;
+      var hit = 0, best = zFar;
+      for (i = 0; i < steps; i++) {
+        ts = zFar + (zNear - zFar) * (i / (steps - 1));
+        p = c2o(sx, sy, ts);
+        s = sdRoundBox3(p[0], p[1], p[2], half, bev);
+        if (s <= 0.6) { hit = 1; best = ts; break; }
+      }
+      if (!hit) continue;
+      /* refine */
+      var lo = best - (zFar - zNear) / steps, hi = best;
+      for (i = 0; i < 6; i++) {
+        ts = (lo + hi) / 2;
+        p = c2o(sx, sy, ts);
+        if (sdRoundBox3(p[0], p[1], p[2], half, bev) <= 0.45) hi = ts; else lo = ts;
+      }
+      ts = hi; p = c2o(sx, sy, ts);
+      e = 0.7;
+      n = [
+        sdRoundBox3(p[0] + e, p[1], p[2], half, bev) - sdRoundBox3(p[0] - e, p[1], p[2], half, bev),
+        sdRoundBox3(p[0], p[1] + e, p[2], half, bev) - sdRoundBox3(p[0], p[1] - e, p[2], half, bev),
+        sdRoundBox3(p[0], p[1], p[2] + e, half, bev) - sdRoundBox3(p[0], p[1], p[2] - e, half, bev)
+      ];
+      var nl = Math.hypot(n[0], n[1], n[2]) || 1;
+      n[0] /= nl; n[1] /= nl; n[2] /= nl;
+      var nc = o2c(n[0], n[1], n[2]);
+      raw = Math.max(0, nc[0] * lx + nc[1] * ly + nc[2] * lz);
+      lit = Math.max(0, Math.min(1, Math.floor(raw * 8 + (T.bayer(x, y) - 0.5) * 0.35) / 8 + 0.08));
+      /* face UV from dominant object-space axis */
+      var ax = Math.abs(p[0]), ay = Math.abs(p[1]), az = Math.abs(p[2]);
+      if (ax >= ay && ax >= az) { u = p[2] / half; v = p[1] / half; }
+      else if (ay >= ax && ay >= az) { u = p[0] / half; v = p[2] / half; }
+      else { u = p[0] / half; v = p[1] / half; }
+      lon = u * Math.PI + rot * 0.15; lat = T.clamp(v, -1, 1) * 0.72;
+      sm = terrainColor(map, spec, lon, lat, x, y);
+      rim = Math.pow(1 - Math.min(1, Math.abs(nc[2])), 2);
+      col = shade(sm.col, lit, x, y, sm.em, rim * 0.7);
+      /* beveled edge highlight */
+      var edge = Math.max(ax, ay, az) / half;
+      var edgeMin = (half - bev * 1.6) / half;
+      if (edge < edgeMin + 0.08) {
+        /* near a second face: bevel */
+        var second = [ax, ay, az].sort(function (a, b) { return b - a; })[1] / half;
+        if (second > edgeMin) {
+          var bk = T.clamp((second - edgeMin) / 0.12, 0, 1);
+          col = col.map(function (v2) { return Math.min(255, Math.round(v2 * (1 - 0.15 * bk) + 18 * bk)); });
+        }
+      }
+      var ci = sample(map, lon, lat);
+      if (map.C[ci] > 90 && T.bayer(x, y) < map.C[ci] / 255) col = shade(T.dqc(map.pal.cloud, 0.35 + lit * 0.65, x, y), lit, x, y, 0, rim * 0.4);
+      hx = sx; hy = sy; hz = ts;
+      col = shadeByRingShadow(col, ringShadowK(hx, hy, hz, R, spec, light));
+      o = (y * W + x) * 4; d[o] = col[0]; d[o + 1] = col[1]; d[o + 2] = col[2]; d[o + 3] = 255;
+    }
+  }
+
   function renderBody(S, cx, cy, R, spec, map, rot, light, t, inflate) {
     S.g.clearRect(0, 0, S.c.width, S.c.height);
     var img = S.g.createImageData(S.c.width, S.c.height);
-    paintRings(img, cx, cy, R, spec, light, true);
-    if (spec.shape && inflate !== 0) paintVoxel(img, cx, cy, R, spec, map, rot, light, t, inflate == null ? 1 : inflate);
+    paintRings(img, cx, cy, R, spec, light, true, t);
+    if (spec.shapeKind === 'square' && inflate !== 0) paintCube(img, cx, cy, R, spec, map, rot, light, t);
+    else if (spec.shape && inflate !== 0) paintVoxel(img, cx, cy, R, spec, map, rot, light, t, inflate == null ? 1 : inflate);
     else if (!spec.shape) paintSphere(img, cx, cy, R, spec, map, rot, light, t);
     else {
       /* inflate 0: flat 2D silhouette */
@@ -590,13 +751,13 @@
         }
       }
     }
-    paintRings(img, cx, cy, R, spec, light, false);
+    paintRings(img, cx, cy, R, spec, light, false, t);
     S.g.putImageData(img, 0, 0);
   }
 
   var sheets = {}, sheetOrder = [];
   function sheetKey(spec, size, n) {
-    return [spec.seed, spec.biome, ((spec.size * 20) | 0), size, n, spec.shape || '-', spec.rings && spec.rings.length, spec.atmoHue, ((spec.land * 20) | 0), ((spec.clouds * 20) | 0), spec.cloudPat, ((spec.city * 10) | 0), ((spec.aurora * 10) | 0), ((spec.glow * 10) | 0), ((spec.iceCaps * 10) | 0), ((spec.craters * 10) | 0), ((spec.volcanoes * 10) | 0), T.paintKey(spec)].join('|');
+    return [spec.seed, spec.biome, ((spec.size * 20) | 0), size, n, spec.shape || '-', spec.shapeKind || '', spec.rings && spec.rings.length, spec.atmoHue, ((spec.land * 20) | 0), ((spec.clouds * 20) | 0), spec.cloudPat, ((spec.city * 10) | 0), ((spec.aurora * 10) | 0), ((spec.glow * 10) | 0), ((spec.iceCaps * 10) | 0), ((spec.craters * 10) | 0), ((spec.volcanoes * 10) | 0), T.paintKey(spec)].join('|');
   }
   P.invalidate = function () { sheets = {}; sheetOrder = []; mapCache = {}; mapKeys = []; };
   P.sheet = function (spec, size) {
@@ -634,7 +795,7 @@
     var rot = (opts.rot != null ? opts.rot : t * (T.reduced ? 0.12 : 0.28));
     var inflate = opts.inflate;
     var pad = padFor(R, spec), dim = pad * 2;
-    var useSheet = !opts.live && inflate == null && (opts.sheet || (spec.shape && R <= 28));
+    var useSheet = !opts.live && inflate == null && !spec.rings.length && (opts.sheet || (spec.shape && spec.shapeKind !== 'square' && R <= 28));
     T.setSmooth(ctx, false);
     if (useSheet && spec.shape) {
       var sh = P.sheet(spec, 72), fi = ((Math.floor(((rot % TAU) + TAU) % TAU / TAU * sh.n)) % sh.n);
@@ -682,6 +843,7 @@
     spec = T.cleanSpec(spec);
     var R = P.bodyRadius(viewR, spec.size);
     var ext = maxRingScale(spec);
+    if (spec.shapeKind === 'square') ext = Math.max(ext, 1.35);
     if (spec.moons && spec.moons.length) ext += 0.4 + 1.7;
     return R * ext + 8;
   };

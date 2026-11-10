@@ -277,7 +277,7 @@
     var shape = null;
     if (typeof s.shape === 'string' && s.shape.length > 8 && s.shape.length < 4000) shape = s.shape.replace(/[^A-Za-z0-9+/=]/g, '').slice(0, 2000);
     var kind = str(s.shapeKind, 12);
-    if (['heart', 'pear', 'bean', 'diamond'].indexOf(kind) < 0) kind = null;
+    if (['heart', 'pear', 'bean', 'diamond', 'square'].indexOf(kind) < 0) kind = null;
     var landD = slate ? 1 : d.land, cloudD = slate ? 0 : d.clouds, atmoD = slate ? 0 : d.atmo;
     var craterD = slate ? 0 : d.craters, iceD = slate ? 0 : d.iceCaps, sizeD = slate ? 0.5 : d.size;
     return {

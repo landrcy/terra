@@ -470,34 +470,19 @@
 
     ctx.putImageData(img, 0, 0);
 
-    /* sun — large, pixel, biome-tinted, bloom already in the sky */
+    /* sun — soft disk and corona; bloom already lives in the sky gradient */
     if (biome !== 'storm') {
-      var sc0 = biome === 'lava' ? '#ff8018' : '#fff6c0', sc1 = biome === 'desert' ? '#f0c45c' : '#ffe8a0', sc2 = biome === 'lava' ? '#c04010' : '#d0c070';
-      for (y = -sr - 8; y <= sr + 8; y++) for (x = -sr - 8; x <= sr + 8; x++) {
-        var rr = Math.hypot(x, y);
+      var sc0 = biome === 'lava' ? '#ffb040' : '#fff8e0', sc1 = biome === 'desert' ? '#ffe08a' : '#ffe8b0', sc2 = biome === 'lava' ? '#e05018' : '#ffc070';
+      var breath = T.reduced ? 1 : (0.94 + 0.06 * Math.sin(t * 0.55));
+      for (y = -sr * 3; y <= sr * 3; y++) for (x = -sr * 3; x <= sr * 3; x++) {
+        var rr = Math.hypot(x, y), px = sunX + x, py = sunY + y;
         if (rr <= sr) {
-          ctx.fillStyle = rr < sr * 0.55 ? sc0 : sc1;
-          if (T.bayer(sunX + x, sunY + y) < 0.95) ctx.fillRect(sunX + x, sunY + y, 1, 1);
-        } else if (rr < sr + 8 && T.bayer(sunX + x + 3, sunY + y) < (1 - (rr - sr) / 8) * 0.5) {
-          ctx.fillStyle = sc2; ctx.fillRect(sunX + x, sunY + y, 1, 1);
-        }
-      }
-      if (!T.reduced) {
-        for (k = 0; k < 10; k++) {
-          var fa = k * Math.PI / 5 + Math.sin(t * 0.35 + k) * 0.08, fl = sr + 5 + (k % 2) * 4;
-          ctx.fillStyle = sc1;
-          ctx.fillRect((sunX + Math.cos(fa) * fl) | 0, (sunY + Math.sin(fa) * fl) | 0, 1, 1);
-        }
-        var ray, rr, rx, ry, reach;
-        ctx.fillStyle = sc1;
-        for (ray = 0; ray < 9; ray++) {
-          var ang = 0.35 + ray * 0.16 + Math.sin(t * 0.2 + ray) * 0.03;
-          reach = horizon - sunY + 8;
-          for (rr = sr + 4; rr < reach; rr++) {
-            rx = (sunX + Math.cos(ang) * rr) | 0;
-            ry = (sunY + Math.sin(ang) * rr) | 0;
-            if (T.bayer(rx, ry) < 0.22 * (1 - rr / reach)) ctx.fillRect(rx, ry, 1, 1);
-          }
+          var nr = rr / sr, limb = Math.pow(T.clamp((nr - 0.72) / 0.28, 0, 1), 1.3);
+          ctx.fillStyle = nr < 0.5 ? sc0 : (limb > 0.45 ? sc2 : sc1);
+          ctx.fillRect(px, py, 1, 1);
+        } else {
+          var fall = Math.pow(T.clamp(1 - (rr - sr) / (sr * 2.1), 0, 1), 2.2) * breath;
+          if (fall > 0.06) { ctx.fillStyle = sc2; ctx.globalAlpha = fall * 0.85; ctx.fillRect(px, py, 1, 1); ctx.globalAlpha = 1; }
         }
       }
     }
@@ -591,7 +576,7 @@
         ctx.drawImage(spr, cx | 0, cy | 0);
       }
     }
-    drawCloudLayer(8, 0.12, 4, horizon * 0.22, 4);
+    drawCloudLayer(7, 0.10, 2, horizon * 0.14, 4);
 
     /* mountains: slope shading, ridgelines, snow/rock, atmospheric perspective */
     function asRgb(c) {
@@ -633,26 +618,25 @@
           ctx.fillStyle = (typeof col === 'string') ? col : mixRgb(col, col, 0);
           ctx.fillRect(hx, top + y2, 1, 1);
         }
-        if (ridge) {
-          ctx.fillStyle = mixRgb(lit, '#f4f0e0', 0.35);
+        if (ridge && haze < 0.3) {
+          ctx.fillStyle = mixRgb(lit, midt, 0.28);
           ctx.fillRect(hx, top, 1, 1);
-          if (hh > amp * 0.7) ctx.fillRect(hx, top + 1, 1, 1);
         }
-        if (snowOn && hh > amp * 0.55 && y2) {
-          var cap = 2 + ((hh - amp * 0.55) / 8) | 0;
-          ctx.fillStyle = biome === 'lava' ? '#d0c0b0' : '#f4f8fc';
-          for (y2 = 0; y2 < cap; y2++) if (T.bayer(hx, top + y2) < 0.85) ctx.fillRect(hx, top + y2, 1, 1);
+        if (snowOn && haze < 0.35 && hh > amp * 0.62 && y2) {
+          var cap = 1 + ((hh - amp * 0.62) / 10) | 0;
+          ctx.fillStyle = biome === 'lava' ? '#c8b8a8' : mixRgb(lit, '#e8eef4', 0.45);
+          for (y2 = 0; y2 < cap; y2++) if (T.bayer(hx, top + y2) < 0.7) ctx.fillRect(hx, top + y2, 1, 1);
         }
         if (biome === 'desert' && T.hash((camX * par + hx) | 0, (top / 6) | 0, seed) < 0.08) {
           ctx.fillStyle = '#8a6a48'; ctx.fillRect(hx, top + 4 + ((T.hash(hx, 3, seed) * 8) | 0), 1, 2);
         }
       }
     }
-    var farLit = mixRgb(farC[1] || farC[0], '#b0c8d8', 0.35);
-    var midLit = mixRgb(midC[1] || midC[0], '#c8d8c0', 0.2);
-    drawRange(0.10, horizon - 36, [mixRgb(farC[0], skyHaze, 0.35), farLit], 38, 0.014, 2, 0.55);
-    drawCloudLayer(5, 0.22, horizon * 0.22, horizon * 0.2, 6);
-    drawRange(0.26, horizon - 18, [mixRgb(midC[0], skyHaze, 0.12), midLit], 26, 0.024, 5, 0.22);
+    var farLit = mixRgb(farC[1] || farC[0], skyHaze, 0.2);
+    var midLit = mixRgb(midC[1] || midC[0], skyHaze, 0.08);
+    drawRange(0.10, horizon - 36, [mixRgb(farC[0], skyHaze, 0.42), farLit], 38, 0.014, 2, 0.62);
+    drawCloudLayer(5, 0.16, 2, Math.max(8, horizon * 0.16), 6);
+    drawRange(0.26, horizon - 18, [mixRgb(midC[0], skyHaze, 0.16), midLit], 26, 0.024, 5, 0.22);
 
     drawRange(0.48, horizon - 6, [midC[1] || grass[0], grass[1] || grass[0]], 14, 0.038, 9, 0.06);
 
@@ -681,8 +665,8 @@
       }
     }
 
-    /* nearer clouds in front of mid hills */
-    drawCloudLayer(6, 0.42, horizon * 0.36, horizon * 0.2, 9);
+    /* a few mid-sky clouds, kept above the mountain line */
+    drawCloudLayer(4, 0.28, horizon * 0.10, horizon * 0.14, 8);
 
     /* water in valleys only, then a short clean ground / strata strip */
     img = ctx.getImageData(0, 0, W, H); d = img.data;

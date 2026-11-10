@@ -15,70 +15,47 @@ canvas { image-rendering: pixelated; image-rendering: crisp-edges; image-renderi
 #view { position: fixed; left: 0; top: 0; z-index: 0; background: #120e0c; touch-action: none; }
 #bgm { position: absolute; width: 0; height: 0; opacity: 0; pointer-events: none; }
 
-/* earthy pixel buttons: textured fill comes from JS (--tile), bevel is hard pixel shadows */
+/* glass panels: translucent starlit frames, earthy accent only on hover/active */
 .ibtn, .tabs button, .presets button, .chipbtn, .swatches button:not(.swatch), #s-tools .ibtn {
   position: relative; display: inline-flex; align-items: center; justify-content: center; gap: calc(2 * var(--px));
   border: 0; margin: 0;
   padding: calc(3 * var(--px)) calc(5 * var(--px)) calc(2 * var(--px));
   color: #fff; font: 26px/1 'Jersey 10', monospace;
-  background-color: #3a2414;
-  background-image: var(--tile);
-  background-repeat: repeat;
-  background-size: calc(16 * var(--px)) calc(16 * var(--px));
+  background-color: rgba(8, 10, 18, 0.34);
+  background-image: none;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   -webkit-font-smoothing: none;
   font-smooth: never;
-  text-shadow: 0 var(--px) 0 #140e0a;
+  text-shadow: 0 var(--px) 0 rgba(4, 6, 12, .8);
   box-shadow:
-    0 calc(-1 * var(--px)) 0 #d4c4a0,
-    0 calc(1 * var(--px)) 0 #1a0e08,
-    calc(-1 * var(--px)) 0 0 #a09070,
-    calc(1 * var(--px)) 0 0 #2a1810,
-    0 calc(-2 * var(--px)) 0 #4a3420,
-    0 calc(2 * var(--px)) 0 #0c0804,
-    calc(-2 * var(--px)) 0 0 #4a3420,
-    calc(2 * var(--px)) 0 0 #0c0804,
-    calc(2 * var(--px)) calc(3 * var(--px)) 0 rgba(10, 6, 4, .55);
-  transition: filter 140ms steps(3, end), transform 90ms steps(2, end);
+    0 0 0 1px rgba(210, 220, 245, 0.42),
+    0 0 0 2px rgba(6, 8, 14, 0.55),
+    0 0 10px rgba(140, 170, 255, 0.16);
+  transition: filter 140ms steps(3, end), transform 90ms steps(2, end), box-shadow 140ms steps(3, end), background-color 140ms steps(3, end);
   cursor: pointer;
 }
 .ibtn.sun, .ibtn.primary, #btn-shape, #btn-launch, #c-land, #pad-jump, #make-btn, #btn-pop {
-  background-color: #6a4a14;
+  background-color: rgba(8, 10, 18, 0.34);
   box-shadow:
-    0 calc(-1 * var(--px)) 0 #ffe08a,
-    0 calc(1 * var(--px)) 0 #2a1808,
-    calc(-1 * var(--px)) 0 0 #d4a04a,
-    calc(1 * var(--px)) 0 0 #3a2408,
-    0 calc(-2 * var(--px)) 0 #8a6020,
-    0 calc(2 * var(--px)) 0 #140c04,
-    calc(-2 * var(--px)) 0 0 #8a6020,
-    calc(2 * var(--px)) 0 0 #140c04,
-    calc(2 * var(--px)) calc(3 * var(--px)) 0 rgba(10, 6, 4, .55);
+    0 0 0 1px rgba(210, 220, 245, 0.42),
+    0 0 0 2px rgba(6, 8, 14, 0.55),
+    0 0 10px rgba(140, 170, 255, 0.16);
 }
 .ibtn:hover, .tabs button:hover, .presets button:hover, .chipbtn:hover, .swatches button:not(.swatch):hover, #s-tools .ibtn:hover {
-  transform: translateY(calc(-1 * var(--px)));
+  background-color: rgba(42, 28, 14, 0.4);
   box-shadow:
-    0 calc(-1 * var(--px)) 0 #fff4c8,
-    0 calc(1 * var(--px)) 0 #1a0e08,
-    calc(-1 * var(--px)) 0 0 #ffe08a,
-    calc(1 * var(--px)) 0 0 #2a1810,
-    0 calc(-2 * var(--px)) 0 #f0c45c,
-    0 calc(2 * var(--px)) 0 #0c0804,
-    calc(-2 * var(--px)) 0 0 #f0c45c,
-    calc(2 * var(--px)) 0 0 #0c0804,
-    0 calc(-3 * var(--px)) 0 #c4f080,
-    0 calc(3 * var(--px)) 0 #0c0804,
-    calc(-3 * var(--px)) 0 0 #c4f080,
-    calc(3 * var(--px)) 0 0 #0c0804,
-    calc(2 * var(--px)) calc(3 * var(--px)) 0 rgba(10, 6, 4, .55);
+    0 0 0 1px #e8c878,
+    0 0 0 2px rgba(8, 10, 14, 0.55),
+    0 0 12px rgba(240, 196, 92, 0.38);
 }
 .ibtn:active, .tabs button:active, .presets button:active, .chipbtn:active, .swatches button:not(.swatch):active, #s-tools .ibtn:active {
-  transform: translateY(calc(2 * var(--px)));
+  background-color: rgba(42, 28, 14, 0.5);
   box-shadow:
-    0 calc(1 * var(--px)) 0 #d4c4a0,
-    0 calc(-1 * var(--px)) 0 #1a0e08,
-    inset 0 calc(2 * var(--px)) 0 rgba(10,6,4,.35);
+    0 0 0 1px #f0c45c,
+    0 0 0 2px rgba(8, 10, 14, 0.6),
+    inset 0 1px 0 rgba(10,6,4,.35),
+    0 0 10px rgba(240, 196, 92, 0.3);
 }
 .ibtn:focus, .tabs button:focus, .presets button:focus { outline: none; }
 .ibtn:focus-visible, .tabs button:focus-visible, .presets button:focus-visible {
@@ -87,16 +64,11 @@ canvas { image-rendering: pixelated; image-rendering: crisp-edges; image-renderi
 .ibtn[disabled] { opacity: .45; transform: none; }
 .ibtn.ghost { background-color: transparent; }
 .ibtn.on, .tabs button[aria-selected="true"], .presets button.on, .chipbtn.on {
+  background-color: rgba(30, 42, 28, 0.4);
   box-shadow:
-    0 calc(-1 * var(--px)) 0 #e8f0d8,
-    0 calc(1 * var(--px)) 0 #0c180c,
-    calc(-1 * var(--px)) 0 0 #8aba60,
-    calc(1 * var(--px)) 0 0 #142014,
-    0 calc(-2 * var(--px)) 0 #5a9a48,
-    0 calc(2 * var(--px)) 0 #081008,
-    calc(-2 * var(--px)) 0 0 #5a9a48,
-    calc(2 * var(--px)) 0 0 #081008,
-    calc(2 * var(--px)) calc(3 * var(--px)) 0 rgba(10, 6, 4, .55);
+    0 0 0 1px #c8e878,
+    0 0 0 2px rgba(8, 10, 14, 0.55),
+    0 0 12px rgba(90, 154, 72, 0.32);
 }
 .has-ico::before, .ibtn[data-ico]::before, .tabs button[data-ico]::before, .presets button[data-ico]::before, .chipbtn[data-ico]::before {
   content: '';
@@ -136,10 +108,17 @@ canvas { image-rendering: pixelated; image-rendering: crisp-edges; image-renderi
 /* builder */
 .panel {
   position: fixed; z-index: 6; right: 16px; top: 64px; bottom: 16px;
-  width: min(340px, calc(100vw - 28px)); overflow: auto;
-  background: var(--ink);
-  box-shadow: 0 -3px 0 var(--foam), 0 3px 0 var(--foam), -3px 0 0 var(--foam), 3px 0 0 var(--foam), 4px 8px 0 rgba(10,6,4,.5);
-  color: #fff; padding: 10px 12px 16px;
+  width: min(272px, calc(100vw - 28px)); max-height: calc(100vh - 20px); overflow: auto;
+  background-color: rgba(6, 8, 16, 0.32);
+  background-image:
+    radial-gradient(circle at 12% 18%, rgba(255,255,255,.5) 0 0.7px, transparent 1.1px),
+    radial-gradient(circle at 78% 12%, rgba(210,220,255,.4) 0 0.6px, transparent 1px),
+    radial-gradient(circle at 36% 58%, rgba(255,255,255,.32) 0 0.55px, transparent 1px),
+    radial-gradient(circle at 88% 72%, rgba(200,220,255,.3) 0 0.5px, transparent 1px),
+    radial-gradient(circle at 22% 88%, rgba(255,255,255,.28) 0 0.5px, transparent 1px),
+    radial-gradient(circle at 58% 36%, rgba(230,240,255,.22) 0 0.5px, transparent 1px);
+  box-shadow: 0 0 0 1px rgba(210, 220, 245, 0.45), 0 0 0 2px rgba(6, 8, 14, 0.55), 0 0 16px rgba(140, 170, 255, 0.18);
+  color: #fff; padding: 8px 10px 14px;
   transition: opacity 220ms steps(5, end), transform 220ms steps(5, end);
 }
 .panel.fx-out { opacity: 0; transform: translate(10px, 0); }
@@ -160,25 +139,25 @@ canvas { image-rendering: pixelated; image-rendering: crisp-edges; image-renderi
   box-shadow: 0 calc(-1 * var(--px)) 0 #fff, 0 calc(1 * var(--px)) 0 #fff, calc(-1 * var(--px)) 0 0 #fff, calc(1 * var(--px)) 0 0 #fff !important;
 }
 .ink {
-  display: block; width: 100%; background: #1c140e; border: 0; color: #fff; font: 22px/1.15 'Jersey 10', monospace;
-  padding: 6px 8px 4px; box-shadow: inset 0 0 0 2px #8a7a60; outline: none; resize: none;
+  display: block; width: 100%; background: rgba(8, 10, 18, 0.45); border: 0; color: #fff; font: 22px/1.15 'Jersey 10', monospace;
+  padding: 6px 8px 4px; box-shadow: inset 0 0 0 1px rgba(210, 220, 245, 0.35); outline: none; resize: none;
 }
-.ink:focus { box-shadow: inset 0 0 0 2px #fff; }
+.ink:focus { box-shadow: inset 0 0 0 1px #e8c878, 0 0 8px rgba(240, 196, 92, 0.25); }
 .ink::placeholder { color: rgba(244,234,212,.4); }
 .count { font-size: 18px; color: #c8c0b0; text-align: right; }
 .card-list { display: flex; flex-direction: column; gap: 8px; margin: 8px 0; }
-.mini { background: #1c140e; padding: 8px; box-shadow: inset 0 0 0 2px #5a4030; }
+.mini { background: rgba(8, 10, 18, 0.35); padding: 8px; box-shadow: inset 0 0 0 1px rgba(210, 220, 245, 0.25); }
 .mini h3 { margin: 0 0 4px; font: 20px/1 'Jersey 10', monospace; color: var(--sun); display: flex; justify-content: space-between; }
 .note { margin: 6px 0 0; color: #ffb0a0; font-size: 18px; min-height: 0; }
 .launch-wrap { margin-top: 12px; display: flex; justify-content: flex-end; }
-#drawbox { display: block; margin: 8px auto; background: #0c0a08; box-shadow: 0 -2px 0 var(--foam), 0 2px 0 var(--foam), -2px 0 0 var(--foam), 2px 0 0 var(--foam); image-rendering: pixelated; cursor: crosshair; touch-action: none; }
+#drawbox { display: block; margin: 8px auto; background: rgba(6, 8, 14, 0.55); box-shadow: 0 0 0 1px rgba(210, 220, 245, 0.4), 0 0 8px rgba(140, 170, 255, 0.12); image-rendering: pixelated; cursor: crosshair; touch-action: none; }
 .help { margin: 4px 0 8px; font-size: 18px; color: #e8f0d8; opacity: .9; }
 
 /* inspect card */
 #card {
   position: fixed; z-index: 7; left: 16px; bottom: 16px; width: min(340px, calc(100vw - 32px));
-  background: var(--ink); color: #fff; padding: 12px 14px 14px;
-  box-shadow: 0 -3px 0 var(--foam), 0 3px 0 var(--foam), -3px 0 0 var(--foam), 3px 0 0 var(--foam), 4px 8px 0 rgba(10,6,4,.5);
+  background: rgba(6, 8, 16, 0.34); color: #fff; padding: 12px 14px 14px;
+  box-shadow: 0 0 0 1px rgba(210, 220, 245, 0.45), 0 0 0 2px rgba(6, 8, 14, 0.55), 0 0 16px rgba(140, 170, 255, 0.2);
   transition: opacity 200ms steps(4, end), transform 200ms steps(4, end);
 }
 #card.fx-out { opacity: 0; transform: translate(0, 8px); }
@@ -190,9 +169,9 @@ canvas { image-rendering: pixelated; image-rendering: crisp-edges; image-renderi
 
 .dlg {
   position: fixed; z-index: 12; left: 50%; bottom: 18%; transform: translate(-50%, 0);
-  width: min(380px, calc(100vw - 28px)); background: var(--ink); color: #fff;
+  width: min(380px, calc(100vw - 28px)); background: rgba(6, 8, 16, 0.36); color: #fff;
   padding: 14px 16px 16px;
-  box-shadow: 0 -3px 0 var(--foam), 0 3px 0 var(--foam), -3px 0 0 var(--foam), 3px 0 0 var(--foam), 4px 8px 0 rgba(10,6,4,.5);
+  box-shadow: 0 0 0 1px rgba(210, 220, 245, 0.45), 0 0 0 2px rgba(6, 8, 14, 0.55), 0 0 16px rgba(140, 170, 255, 0.2);
   transition: opacity 200ms steps(4, end), transform 200ms steps(4, end);
 }
 .dlg h2 { margin: 0 0 8px; font: 32px/1 'Jersey 10', monospace; }
@@ -201,13 +180,13 @@ canvas { image-rendering: pixelated; image-rendering: crisp-edges; image-renderi
 .dlg.fx-out { opacity: 0; transform: translate(-50%, 8px); }
 .toast {
   position: fixed; z-index: 30; top: 70px; left: 16px; margin: 0; padding: 7px 14px 5px;
-  font-size: 22px; color: #fff; background: var(--ink);
-  box-shadow: 0 -3px 0 var(--sun), 0 3px 0 var(--sun), -3px 0 0 var(--sun), 3px 0 0 var(--sun);
+  font-size: 22px; color: #fff; background: rgba(6, 8, 16, 0.55);
+  box-shadow: 0 0 0 1px rgba(240, 196, 92, 0.7), 0 0 12px rgba(240, 196, 92, 0.25);
 }
 #hoverchip {
   position: fixed; z-index: 7; pointer-events: none; transform: translate(-50%, -120%);
-  background: var(--ink); color: #fff; font-size: 20px; padding: 4px 8px 3px;
-  box-shadow: 0 -2px 0 var(--foam), 0 2px 0 var(--foam), -2px 0 0 var(--foam), 2px 0 0 var(--foam);
+  background: rgba(6, 8, 16, 0.5); color: #fff; font-size: 20px; padding: 4px 8px 3px;
+  box-shadow: 0 0 0 1px rgba(210, 220, 245, 0.45), 0 0 10px rgba(140, 170, 255, 0.16);
 }
 #hoverchip[hidden] { display: none !important; }
 
@@ -221,9 +200,9 @@ canvas { image-rendering: pixelated; image-rendering: crisp-edges; image-renderi
   width: max-content; max-width: calc(100vw - 160px);
   overflow-x: auto; overflow-y: hidden;
   padding: calc(2 * var(--px));
-  background: #140e0a;
-  box-shadow: 0 calc(-1 * var(--px)) 0 #d4c4a0, 0 calc(1 * var(--px)) 0 #1a0e08, calc(-1 * var(--px)) 0 0 #a09070, calc(1 * var(--px)) 0 0 #2a1810;
-  scrollbar-width: thin; scrollbar-color: #5a9a48 #140e0a;
+  background: rgba(6, 8, 16, 0.32);
+  box-shadow: 0 0 0 1px rgba(210, 220, 245, 0.4), 0 0 12px rgba(140, 170, 255, 0.16);
+  scrollbar-width: thin; scrollbar-color: #5a9a48 rgba(8,10,16,0.4);
 }
 #surface-ui .tools .ibtn {
   flex: 0 0 auto;

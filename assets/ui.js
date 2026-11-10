@@ -24,6 +24,7 @@
     pear:   ['...ww...', '..wwww..', '..wwww..', '.wwyyyy.', 'wwyyyyyw', '.wyyyyw.', '..oooo..', '........'],
     bean:   ['........', '..wwww..', '.wwyyyy.', 'wwyyyyyw', 'wwyyyyyw', '.woooww.', '..oo....', '........'],
     gem:    ['...w....', '..www...', '.wyyyyw.', 'wwyyyyww', '.woyyow.', '..oooo..', '........', '........'],
+    square: ['..wwww..', '.wyyyww.', 'wwyyyyyw', 'wywyyyow', 'wywyyow.', 'wywoow..', '.ooo....', '........'],
     draw:   ['......y.', '.....yw.', '....yww.', '...yww..', '..yww...', '.www....', 'ww......', '........'],
     erase:  ['........', '.wwww...', '.w..ww..', '..w..ww.', '...w..w.', '....www.', '........', '........'],
     clear:  ['........', '.w....w.', '..w..w..', '...ww...', '..w..w..', '.w....w.', '........', '........'],
@@ -96,7 +97,7 @@
   function skinOne(el) {
     if (!el || el.tagName !== 'BUTTON') return;
     if (el.classList.contains('swatch')) return;
-    el.style.setProperty('--tile', 'url(' + tileURL(kindOf(el)) + ')');
+    el.style.setProperty('--tile', 'none');
     var ico = el.getAttribute('data-ico');
     if (ico) {
       el.style.setProperty('--ico', 'url(' + iconURL(ico) + ')');
