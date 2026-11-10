@@ -55,12 +55,6 @@
         '.kkssssskk.',
         'kkssssssskk'
       ]},
-    tree: { pal:{ l:'#145018', m:'#2a7a30', h:'#4aaa40', d:'#0e3010', t:'#5a3a14', k:'#3a2410', f:'#d04040' },
-      rows:['.....h.....','....hmh....','...hmmmh...','..hmhhmhh..','.hmmhmmhmh.','hmhdhmmhmhh','hhmhttthmh.','..hktkhh...','...ttt.....','...ttt.....','...kkk.....']},
-    pine: { pal:{ l:'#0e2814', m:'#245a30', h:'#3a7840', t:'#4a3020', k:'#2a1c10', d:'#0a1c10' },
-      rows:['.....h.....','....hdh....','...hmlmh...','..hmlmlmh..','.hmlmmlmmh.','hmlmlmlmlmh','.mmtttttmm.','....ktk....','....ttt....']},
-    palm: { pal:{ l:'#2a7a30', h:'#4aaa40', t:'#8a5a20', k:'#5a3a14', d:'#1a4a20' },
-      rows:['h...h...h','.hd.h.dh.','..hhhhh..','...hlh...','....t....','....t....','....t....','....k....']},
     flag: { pal:{ p:'#d0d0d4', r:'#e04040', d:'#801010', t:'#5a4030', w:'#f0f0f4', k:'#2a1a10' },
       rows:['ktrrrrw','ktrrrrd','ktrrww.','ktrr...','kt.....','kt.....','kt.....','kk.....'] },
     lamp: { pal:{ t:'#3a3a40', y:'#ffe080', o:'#f0c040', w:'#fff6c0', k:'#1a1a20' },
@@ -68,41 +62,18 @@
     well: { pal:{ s:'#6a6a70', d:'#3a3a40', b:'#2a4a6a', w:'#8a5a30', l:'#8a8a90', k:'#1a1a20' },
       rows:['.wk.kw.', 'wwwlwww', '.kssssk.', '.sdbds.', '.sldls.', '.kssssk.'] },
     bench: { pal:{ w:'#8a5a30', d:'#5a3a18', l:'#c48a50', k:'#2a1808' }, rows:['.......','lllllll','wdkdkdw','d.....d'] },
-    garden: { pal:{ l:'#2a7a30', p:'#e070a0', y:'#f0d040', b:'#4060c0', w:'#f8f0e0', r:'#d04060', k:'#1a4018' },
-      rows:['.p.y.b.r.','wlwlwlwlw','.k.k.k.k.'] },
     windmill: { pal:{ w:'#e8e0d0', d:'#6a5a40', r:'#8a3020', s:'#c8c0b0', k:'#2a2010' },
       rows:['w.....w','.w.s.w.','.wsrsw.','wwkwwsw','.wdwdw.','.wdwdw.','.kdddk.'] },
     sign: { pal:{ w:'#c4a06a', d:'#5a3a18', i:'#2a1a10', l:'#d8b878', k:'#1a1008' },
       rows:['.kwwwk.','.wiiiw.','.wlllw.','.kwwwk.','...d...','...d...'] },
     gift: { pal:{ r:'#c02828', g:'#f0d060', b:'#8a1818', w:'#fff0b0', k:'#6a1010' },
       rows:['.gwg.', 'grrrg','gbrbg','krrrk'] },
-    print: { pal:{ s:'#3a2a20' }, rows:['s.s','.s.','s.s'] },
-    cactus: { pal:{ g:'#2a7a3a', l:'#48a048', d:'#1a5020', k:'#0e3014' },
-      rows:['.l...l.','.gl.lg.','..gdg..','..gdg..','..gdg..','..kdk..'] },
-    spire: { pal:{ i:'#d0e4f0', s:'#8ab0c8', d:'#4a7088', k:'#2a4050' },
-      rows:['..i..','.isi.','.isi.','isdsi','isdsi','.kdk.'] },
-    mush: { pal:{ c:'#d05040', s:'#f0d0c0', t:'#c8b090', k:'#6a2018', d:'#8a3020' },
-      rows:['.kck.', 'cdcsc', '.tst.', '..t..'] },
-    oak: { pal:{ l:'#1a4818', m:'#2a6a28', h:'#3e8a38', d:'#0c2810', t:'#5a3a14', k:'#2a1c0c' },
-      rows:['....hhhhhh....','...hhmhmmhh...','..hmhmmhmhmh..','.hmhmhdhmhmhh.','hhmhmmhmmhmhh.','hhhmmttthmmhh.','..hhktkthh....','....tttt......','....tttt......','....kkkk......']},
-    birch: { pal:{ l:'#2a7a30', m:'#4aaa40', h:'#6acc58', t:'#f0ece0', k:'#2a2418', s:'#c8c0b0', d:'#1a4018' },
-      rows:['....m....','...mlm...','..mhlhm..','.mlhdhlm.','mhlmlmlhm','.mmstkmm.','....sts...','....sts...','....kkk...']},
-    willow: { pal:{ l:'#245a28', m:'#3a7a38', h:'#58a448', t:'#6a4a20', k:'#3a2810', d:'#163818' },
-      rows:['..hhhhhhhhh..','.hmlmlmlmlmh.','hmlhmlhmlhmlh','hd.m.t.m.dh..','.l..ttt..l...','l...ttt...l..','....ttt......','....kkk......']},
-    bush: { pal:{ l:'#1a5820', m:'#2e7a30', h:'#4a9a40', f:'#e070a0', y:'#f0d040', k:'#1a1008' },
-      rows:['..h.y.h..','.hmfhmhmh','hmhmhmhmh','.kkkkkkk.']},
-    fruit: { pal:{ l:'#1a5818', m:'#2a7a28', h:'#48a040', r:'#d04030', y:'#f0c040', t:'#5a3a14', k:'#3a2410' },
-      rows:['....h.r....','...hmhrmh..','..hrhmmhrh.','hhmryhmmrhh','.hhmtttmbh.','...ktk.....','...ttt.....','...kkk.....']},
-    tallpine: { pal:{ l:'#0a2410', m:'#1e4a24', h:'#326838', t:'#4a3020', k:'#2a1c10', d:'#081808' },
-      rows:['.....h.....','....hdh....','....hmh....','...hmlmh...','...hmhmh...','..hmlmlmh..','..hmhmmmh..','.hmlmlmlmh.','hmlmmlmlmmh','.mmtttttmm.','....ktk....','....ttt....','....kkk....']},
-    fern: { pal:{ l:'#1a5820', m:'#2e7a30', h:'#4a9a40', k:'#1a1008' },
-      rows:['h...h...h','.h.hmh.h.','..hmhmh..','...mkm...']},
-    saguaro: { pal:{ g:'#2a7a3a', l:'#48a048', d:'#1a5020', k:'#0e3014', f:'#e070a0' },
-      rows:['.l.....l.','.gl.f.lg.','..g.l.g..','..glglg..','...gdg...','...gdg...','...gdg...','...kdk...'] }
+    print: { pal:{ s:'#3a2a20' }, rows:['s.s','.s.','s.s'] }
   };
 
+  var BUILD = { house:1, cabin:1, tower:1, flag:1, lamp:1, well:1, bench:1, windmill:1, sign:1, gift:1, print:1 };
   var sprCache = {};
-  function sprite(kind) {
+  function asciiSprite(kind) {
     if (sprCache[kind]) return sprCache[kind];
     var def = SPR[kind] || SPR.flag, rows = def.rows, pal = def.pal, w = rows[0].length, h = rows.length;
     var c = document.createElement('canvas'); c.width = w; c.height = h;
@@ -112,7 +83,7 @@
       col = T.hex(pal[ch] || '#fff'); o = (y * w + x) * 4;
       d[o] = col[0]; d[o + 1] = col[1]; d[o + 2] = col[2]; d[o + 3] = 255;
     }
-    /* dark outline on transparent edges */
+    /* buildings keep a thin dark edge so they read on grass; vegetation does not */
     var o2 = new Uint8Array(d);
     for (y = 0; y < h; y++) for (x = 0; x < w; x++) {
       o = (y * w + x) * 4;
@@ -123,55 +94,388 @@
         if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
         if (d[(ny * w + nx) * 4 + 3] === 255) hit = 1;
       }
-      if (hit) { o2[o] = 18; o2[o + 1] = 12; o2[o + 2] = 6; o2[o + 3] = 255; }
+      if (hit) { o2[o] = 28; o2[o + 1] = 20; o2[o + 2] = 12; o2[o + 3] = 255; }
     }
     for (i = 0; i < o2.length; i++) d[i] = o2[i];
     g.putImageData(img, 0, 0); return (sprCache[kind] = c);
   }
-  S.sprite = sprite;
 
-  var SKY = {
-    ocean:  ['#071018','#0c2034','#163850','#1e5470','#2a7090','#3a90b0','#58b0c8','#7cc8d8'],
-    forest: ['#081410','#0c2018','#143028','#1c4434','#245840','#2e6c4c','#3a8058','#4a9468'],
-    garden: ['#102018','#183428','#204838','#286048','#347858','#489068','#64a878','#88c090'],
-    desert: ['#1c1010','#2c1814','#4a2820','#6a3c24','#8a5428','#b07038','#d09048','#e8b868'],
-    tundra: ['#0c141c','#141c2c','#1c2838','#283848','#344858','#446070','#587888','#7090a0'],
-    ice:    ['#0a101c','#101c30','#182c48','#204060','#2c5878','#3c7498','#5890b4','#78b0d0'],
-    lava:   ['#140404','#200808','#2c0c0c','#3a1410','#4a2014','#6a2c14','#8a3c18','#b05020'],
-    storm:  ['#100c18','#181424','#241c30','#302438','#3c3048','#4c3c58','#5c4c68','#6c5c78']
+  function vegPal(biome) {
+    if (biome === 'desert') return {
+      leaf: ['#1f4a2a', '#2f7a3a', '#56a84a', '#9ad65a'],
+      trunk: ['#5a3a18', '#8a5a30', '#b88850', '#d0a870'],
+      grass: ['#8a7a3a', '#b8a050', '#dcc878'],
+      flower: ['#ff6a8a', '#ffe03a', '#ff8a30'], fruit: '#e07040'
+    };
+    if (biome === 'ice' || biome === 'tundra') return {
+      leaf: ['#0e2818', '#1a4a30', '#2a6a44', '#4a8860'],
+      trunk: ['#3a2a20', '#5a4030', '#7a5a40', '#9a7860'],
+      grass: ['#4a5a50', '#6a7a70', '#8aa098'],
+      snow: ['#8aa0c8', '#c8d8f0', '#ffffff'],
+      flower: ['#e8f0ff', '#c0d0f0', '#ffe8f0'], fruit: '#c8d8f0'
+    };
+    if (biome === 'lava') return {
+      leaf: ['#3a2210', '#5a3a18', '#8a5424', '#b87838'],
+      trunk: ['#2a1010', '#4a2018', '#6a3020', '#8a4030'],
+      grass: ['#3a1810', '#5a2414', '#7a3018'],
+      flower: ['#ff6a30', '#ffd040', '#ff8030'], fruit: '#ff5030'
+    };
+    if (biome === 'ocean') return {
+      leaf: ['#0e3a24', '#1a6a38', '#2ea04a', '#70d870'],
+      trunk: ['#5a3a18', '#8a5a30', '#c49050', '#d8b070'],
+      grass: ['#186828', '#28a040', '#58c860'],
+      flower: ['#ffe03a', '#ff6a8a', '#88e0ff'], fruit: '#ff8040'
+    };
+    if (biome === 'storm') return {
+      leaf: ['#143020', '#1e4a30', '#2a6840', '#3a8850'],
+      trunk: ['#2a2018', '#4a3828', '#6a5038', '#8a6a50'],
+      grass: ['#2a3a28', '#3a4a38', '#5a6a50'],
+      flower: ['#c0a0d0', '#e0c0ff', '#ffe08a'], fruit: '#c07080'
+    };
+    /* forest / garden — bright leafy greens like The Void */
+    return {
+      leaf: biome === 'garden'
+        ? ['#145028', '#228038', '#3aa848', '#6ad058']
+        : ['#12301c', '#1f5a2c', '#2f8038', '#58a84a'],
+      trunk: ['#4a3020', '#7a5a38', '#a88050', '#d0a870'],
+      grass: biome === 'garden'
+        ? ['#228038', '#3aa848', '#6ad058']
+        : ['#1f5a2c', '#2f8038', '#58a84a'],
+      flower: ['#ff6a8a', '#ffe03a', '#ff8a30', '#8a5aff'], fruit: '#d04030'
+    };
+  }
+
+  function rngAt(a, b, seed) {
+    var n = 0;
+    return function () { n += 1; return T.hash(a + n * 17, b, seed); };
+  }
+  function ri(r, a, b) { return a + ((r() * (b - a + 1)) | 0); }
+  function rr(r, a, b) { return a + r() * (b - a); }
+
+  function tonePal(pal, v, x, y) {
+    var n = pal.length - 1, t = T.clamp(v, 0, 1) * n, i = t | 0;
+    if (i >= n) return pal[n];
+    return (t - i) > T.bayer(x | 0, y | 0) ? pal[i + 1] : pal[i];
+  }
+  function asHex(c) { return typeof c === 'string' ? c : ('#' + [c[0], c[1], c[2]].map(function (n) { n = T.clamp(n, 0, 255) | 0; return (n < 16 ? '0' : '') + n.toString(16); }).join('')); }
+  function setPx(d, w, h, x, y, col) {
+    x = x | 0; y = y | 0;
+    if (x < 0 || y < 0 || x >= w || y >= h) return;
+    var c = typeof col === 'string' ? T.hex(col) : col;
+    var o = (y * w + x) * 4;
+    d[o] = c[0] | 0; d[o + 1] = c[1] | 0; d[o + 2] = c[2] | 0; d[o + 3] = 255;
+  }
+  function getA(d, w, h, x, y) {
+    x = x | 0; y = y | 0;
+    if (x < 0 || y < 0 || x >= w || y >= h) return 0;
+    return d[(y * w + x) * 4 + 3];
+  }
+  function leafBlob(d, w, h, cx, cy, rx, ry, pal) {
+    var x, y, dx, dy, x0 = Math.floor(cx - rx), x1 = Math.ceil(cx + rx), y0 = Math.floor(cy - ry), y1 = Math.ceil(cy + ry);
+    for (y = y0; y <= y1; y++) for (x = x0; x <= x1; x++) {
+      dx = (x + 0.5 - cx) / Math.max(0.6, rx); dy = (y + 0.5 - cy) / Math.max(0.6, ry);
+      if (dx * dx + dy * dy <= 1) setPx(d, w, h, x, y, tonePal(pal, (1 - dy) * 0.45 + (-dx) * 0.22 + 0.22, x, y));
+    }
+  }
+  function mkCan(d, w, h) {
+    var c = document.createElement('canvas'); c.width = w; c.height = h;
+    var g = c.getContext('2d'), img = g.createImageData(w, h);
+    img.data.set(d); g.putImageData(img, 0, 0); return c;
+  }
+  function alloc(w, h) { return new Uint8ClampedArray(w * h * 4); }
+
+  var vegCache = {};
+  function procVeg(kind, variant, biome) {
+    var key = kind + ':' + (variant | 0) + ':' + (biome || 'garden');
+    if (vegCache[key]) return vegCache[key];
+    var pal = vegPal(biome), r = rngAt(variant | 0, kind.length * 13, (variant * 997) ^ (kind.charCodeAt(0) * 131));
+    var snowy = (biome === 'ice' || biome === 'tundra');
+    var c;
+    if (kind === 'pine' || kind === 'tallpine') c = makePine(r, pal, snowy, kind === 'tallpine');
+    else if (kind === 'palm') c = makePalm(r, pal);
+    else if (kind === 'cactus' || kind === 'saguaro') c = makeCactus(r, pal, kind === 'saguaro');
+    else if (kind === 'bush') c = makeBush(r, pal);
+    else if (kind === 'fern') c = makeFern(r, pal);
+    else if (kind === 'mush') c = makeMush(r, pal, biome);
+    else if (kind === 'tuft') c = makeTuft(r, pal);
+    else if (kind === 'flower' || kind === 'garden') c = makeFlower(r, pal, kind === 'garden');
+    else if (kind === 'spire') c = makeSpire(r, pal, snowy, biome);
+    else if (kind === 'rock') c = makeRock(r, pal, biome);
+    else if (kind === 'willow') c = makeWillow(r, pal);
+    else if (kind === 'birch') c = makeOak(r, pal, { birch: 1 });
+    else if (kind === 'fruit') c = makeOak(r, pal, { fruit: 1 });
+    else c = makeOak(r, pal, {}); /* tree, oak, default */
+    return (vegCache[key] = c);
+  }
+
+  function makeOak(r, pal, opt) {
+    opt = opt || {};
+    var H = ri(r, 30, 44), W = ri(r, 22, 34), d = alloc(W, H), cx = W / 2, tw = ri(r, 3, 4), th = ri(r, 10, 15), x, y, i;
+    var trunk = opt.birch ? ['#f0ece0', '#d8d0c0', '#c0b8a8', '#3a2a20'] : pal.trunk;
+    for (y = 0; y < th; y++) for (x = 0; x < tw + (y > th - 3 ? 1 : 0); x++) {
+      var tx = (cx - tw / 2 + x) | 0, ty = H - 1 - y;
+      var col = tonePal(trunk, 0.8 - x / tw * 0.7, tx, ty);
+      if (opt.birch && y % 5 === 2) col = trunk[3];
+      setPx(d, W, H, tx, ty, col);
+    }
+    /* short forks into the canopy */
+    var topY = H - th;
+    for (i = 0; i < 2; i++) {
+      var dir = i ? 1 : -1, fx = cx | 0, fy = topY + 3, k;
+      for (k = 0; k < 5; k++) { fx += dir; fy -= 1; setPx(d, W, H, fx, fy, trunk[1]); }
+    }
+    var n = ri(r, 5, 7);
+    for (i = 0; i < n; i++) {
+      var a = i / n * Math.PI * 2 + rr(r, 0, 1), dist = i === 0 ? 0 : rr(r, W * 0.12, W * 0.28);
+      leafBlob(d, W, H, cx + Math.cos(a) * dist, topY * 0.55 + Math.sin(a) * dist * 0.6 + 2, rr(r, W * 0.22, W * 0.34), rr(r, W * 0.2, W * 0.3), pal.leaf);
+    }
+    for (i = 0; i < 16; i++) {
+      x = ri(r, 2, W - 3); y = ri(r, 2, topY + 2);
+      if (getA(d, W, H, x, y)) setPx(d, W, H, x, y, pal.leaf[i % 2 ? 3 : 0]);
+    }
+    if (opt.fruit) {
+      for (i = 0; i < 5; i++) {
+        x = ri(r, 5, W - 6); y = ri(r, 4, topY + 4);
+        if (getA(d, W, H, x, y)) { setPx(d, W, H, x, y, pal.fruit || '#d04030'); setPx(d, W, H, x + 1, y, pal.fruit || '#d04030'); }
+      }
+    }
+    return mkCan(d, W, H);
+  }
+  function makeWillow(r, pal) {
+    var H = ri(r, 30, 42), W = ri(r, 26, 36), d = alloc(W, H), cx = W / 2, th = 12, x, y, i, s;
+    for (y = 0; y < th; y++) for (x = 0; x < 3; x++) setPx(d, W, H, (cx - 1 + x) | 0, H - 1 - y, tonePal(pal.trunk, 0.7 - x * 0.25, x, y));
+    leafBlob(d, W, H, cx, 8, W * 0.38, 7, pal.leaf);
+    for (i = 0; i < 7; i++) {
+      var ax = 3 + i * ((W - 6) / 6), len = 10 + (i % 3) * 3;
+      for (s = 0; s < len; s++) setPx(d, W, H, ax + Math.sin(s * 0.4) * 0.6, 12 + s, pal.leaf[s % 3 === 0 ? 2 : 1]);
+    }
+    return mkCan(d, W, H);
+  }
+  function makePine(r, pal, snowy, tall) {
+    var H = ri(r, tall ? 38 : 32, tall ? 52 : 44), W = Math.round(H * rr(r, 0.48, 0.6)) | 1, d = alloc(W, H);
+    var cx = (W - 1) / 2, tiers = ri(r, 4, 6), tH = (H - 4) / tiers, x, y;
+    for (y = 0; y < H - 4; y++) {
+      var t = y / (H - 4), tier = Math.floor(y / tH), ty = (y - tier * tH) / tH;
+      var hw = (0.18 + ty * 0.82) * cx * (0.3 + 0.7 * (tier + 1) / tiers) + 0.6;
+      for (x = Math.round(cx - hw); x <= Math.round(cx + hw); x++) {
+        var v = 0.5 - (x - cx) / (cx + 1) * 0.5 + (ty < 0.22 ? 0.14 : 0) - ty * 0.15;
+        var col = tonePal(pal.leaf, v, x, y);
+        if (snowy && ty < 0.38 && Math.abs(x - cx) < hw - 0.5) col = tonePal(pal.snow || ['#c8d8f0', '#ffffff'], 0.6 - (x - cx) / (cx + 1) * 0.25 + (1 - ty) * 0.3, x, y);
+        setPx(d, W, H, x, y, col);
+      }
+    }
+    setPx(d, W, H, cx | 0, H - 3, pal.trunk[1]); setPx(d, W, H, (cx | 0) + 1, H - 3, pal.trunk[0]);
+    setPx(d, W, H, cx | 0, H - 2, pal.trunk[1]); setPx(d, W, H, (cx | 0) + 1, H - 2, pal.trunk[1]);
+    setPx(d, W, H, cx | 0, H - 1, pal.trunk[0]); setPx(d, W, H, (cx | 0) + 1, H - 1, pal.trunk[0]);
+    return mkCan(d, W, H);
+  }
+  function makePalm(r, pal) {
+    var H = ri(r, 32, 44), W = 36, d = alloc(W, H), lean = rr(r, -5, 5), bx = W / 2 - lean * 0.4, i, s, pts = [];
+    for (i = 0; i <= H - 6; i++) {
+      var t = i / (H - 6), x = bx + lean * t * t * 1.4, y = H - 1 - i;
+      pts.push([x, y]); setPx(d, W, H, x, y, pal.trunk[i % 4 < 2 ? 1 : 0]); setPx(d, W, H, x + 1, y, pal.trunk[i % 4 < 2 ? 2 : 1]);
+    }
+    var top = pts[pts.length - 1], n = 7;
+    for (i = 0; i < n; i++) {
+      var a = (i / n) * Math.PI - Math.PI, len = rr(r, 9, 13);
+      var ex = top[0] + Math.cos(a) * len, ey = top[1] + Math.sin(a) * len * 0.35 + len * 0.45 * Math.abs(Math.cos(a));
+      var mx = (top[0] + ex) / 2, my = Math.min(top[1], ey) - 3 - rr(r, 0, 2);
+      for (s = 0; s <= 18; s++) {
+        var u = s / 18;
+        var xx = (1 - u) * (1 - u) * top[0] + 2 * u * (1 - u) * mx + u * u * ex;
+        var yy = (1 - u) * (1 - u) * top[1] + 2 * u * (1 - u) * my + u * u * ey;
+        setPx(d, W, H, xx, yy, pal.leaf[2 - (s % 5 === 0 ? 1 : 0)]);
+        setPx(d, W, H, xx, yy + 1, pal.leaf[1]);
+        if (s % 3 === 0) setPx(d, W, H, xx, yy + 2, pal.leaf[0]);
+      }
+    }
+    return mkCan(d, W, H);
+  }
+  function makeCactus(r, pal, tall) {
+    var H = ri(r, tall ? 24 : 16, tall ? 36 : 28), W = 18, d = alloc(W, H), cx = 9, cols = pal.leaf;
+    function stem(x, y0, y1, wd) {
+      var y, i;
+      for (y = y0; y <= y1; y++) for (i = 0; i < wd; i++) setPx(d, W, H, x + i, y, tonePal(cols, 0.85 - i / wd * 0.7 + (i === 1 && y % 3 === 0 ? -0.05 : 0), x + i, y));
+      setPx(d, W, H, x + 1, y0 - 1, cols[2]); setPx(d, W, H, x + wd - 2, y0 - 1, cols[1]);
+    }
+    stem(cx - 2, 2, H - 1, 4); setPx(d, W, H, cx - 1, 1, cols[2]); setPx(d, W, H, cx, 1, cols[2]);
+    var arms = ri(r, 1, tall ? 2 : 2), a;
+    for (a = 0; a < arms; a++) {
+      var side = a ? 1 : -1, ay = ri(r, (H * 0.4) | 0, (H * 0.7) | 0), len = ri(r, 4, 6), i;
+      for (i = 0; i < len; i++) setPx(d, W, H, side < 0 ? cx - 2 - i - 1 : cx + 2 + i, ay, cols[side < 0 ? 2 : 1]);
+      stem(side < 0 ? cx - 2 - len - 1 : cx + 2 + len - 1, ay - ri(r, 4, 7), ay + 2, 3);
+    }
+    if (pal.flower && r() < 0.7) { var fl = pal.flower[0] || pal.flower; setPx(d, W, H, cx - 1, 0, fl); setPx(d, W, H, cx, 0, fl); }
+    return mkCan(d, W, H);
+  }
+  function makeBush(r, pal) {
+    var W = ri(r, 12, 18), H = ri(r, 8, 12), d = alloc(W, H), i;
+    for (i = 0; i < 3; i++) leafBlob(d, W, H, W * (0.28 + i * 0.22), H * 0.62, W * 0.3, H * 0.42, pal.leaf);
+    for (i = 0; i < 8; i++) {
+      var x = ri(r, 1, W - 2), y = ri(r, 1, H - 2);
+      if (getA(d, W, H, x, y)) setPx(d, W, H, x, y, i < 3 && pal.fruit ? pal.fruit : pal.leaf[3]);
+    }
+    return mkCan(d, W, H);
+  }
+  function makeFern(r, pal) {
+    var W = 16, H = 12, d = alloc(W, H), i, s;
+    for (i = 0; i < 6; i++) {
+      var a = -Math.PI + (i / 5) * Math.PI, len = rr(r, 6, 9);
+      for (s = 0; s <= len; s++) {
+        var u = s / len, x = 8 + Math.cos(a) * s, y = H - 2 + Math.sin(a) * s * 0.9 + u * u * 4 * Math.abs(Math.cos(a));
+        setPx(d, W, H, x, y, pal.leaf[s % 3 === 0 ? 2 : 1]);
+        if (s % 2 === 0) setPx(d, W, H, x, y + 1, pal.leaf[0]);
+      }
+    }
+    return mkCan(d, W, H);
+  }
+  function makeMush(r, pal, biome) {
+    var W = 9, H = 10, d = alloc(W, H);
+    var cap = biome === 'ice' ? ['#7aa0c8', '#c0d8f0', '#ffffff'] : (biome === 'lava' ? ['#7a1a12', '#c04028', '#ff8060'] : ['#7a2a2a', '#e05050', '#ff9a9a']);
+    var y, x;
+    for (y = 4; y < H; y++) { setPx(d, W, H, 4, y, '#e8e0d0'); setPx(d, W, H, 5, y, '#d8d0c0'); }
+    for (y = 1; y <= 5; y++) for (x = 1; x <= 7; x++) {
+      var dx = (x - 4) / 3.4, dy = (y - 3) / 2.6;
+      if (dx * dx + dy * dy <= 1 && dy < 0.35) setPx(d, W, H, x, y, tonePal(cap, (1 - dy) * 0.5 + 0.2, x, y));
+    }
+    setPx(d, W, H, 2, 2, '#fff'); setPx(d, W, H, 6, 3, '#fff');
+    return mkCan(d, W, H);
+  }
+  function makeTuft(r, pal) {
+    var W = 9, H = ri(r, 5, 9), d = alloc(W, H), i, y, g = pal.grass || pal.leaf;
+    for (i = 0; i < 6; i++) {
+      var bx = ri(r, 1, W - 2), bh = ri(r, 3, H), sw = ri(r, -1, 1);
+      for (y = 0; y < bh; y++) setPx(d, W, H, bx + (y > bh * 0.5 ? sw : 0), H - 1 - y, g[Math.min(g.length - 1, 1 + (y > bh * 0.6 ? 1 : 0))]);
+    }
+    return mkCan(d, W, H);
+  }
+  function makeFlower(r, pal, bed) {
+    var W = bed ? 15 : 9, H = bed ? 8 : 8, d = alloc(W, H), fl = pal.flower || ['#ff6a8a', '#ffe03a'], g = pal.grass || pal.leaf, i, y;
+    var n = bed ? 4 : 1;
+    for (i = 0; i < n; i++) {
+      var x = bed ? 2 + i * 3 : 4, col = fl[i % fl.length];
+      for (y = 0; y < 4; y++) setPx(d, W, H, x, H - 1 - y, g[1]);
+      setPx(d, W, H, x, H - 5, col); setPx(d, W, H, x - 1, H - 4, col); setPx(d, W, H, x + 1, H - 4, col); setPx(d, W, H, x, H - 4, '#ffe27a'); setPx(d, W, H, x, H - 3, col);
+    }
+    return mkCan(d, W, H);
+  }
+  function makeSpire(r, pal, snowy, biome) {
+    var W = ri(r, 10, 18), H = ri(r, 18, 32), d = alloc(W, H);
+    var cols = biome === 'lava'
+      ? ['#2a0e0c', '#5a2010', '#8a3a18', '#c06028']
+      : (snowy ? (pal.snow || ['#3a6aa0', '#7ab8e8', '#c8ecff', '#ffffff']) : ['#3a6aa0', '#7ab8e8', '#c8ecff', '#ffffff']);
+    var n = ri(r, 2, 4), i, x, y;
+    for (i = 0; i < n; i++) {
+      var bx = W * (0.2 + 0.6 * (i / (n - 1 || 1))), h = H * rr(r, 0.5, 1), w = rr(r, 2, 3.5);
+      for (y = 0; y < h; y++) {
+        var t = y / h, hw = w * (1 - t);
+        for (x = -hw; x <= hw; x++) setPx(d, W, H, bx + x, H - 1 - y, cols[x < -0.5 ? 2 : (x < w * 0.4 ? 1 : 0)]);
+      }
+      setPx(d, W, H, bx - 1, H - h + 2, cols[3] || cols[2]);
+    }
+    return mkCan(d, W, H);
+  }
+  function makeRock(r, pal, biome) {
+    var W = ri(r, 8, 16), H = ri(r, 5, 10), d = alloc(W, H);
+    var cols = biome === 'ice' ? ['#6a7a8a', '#8aa0b0', '#c0d0dc', '#e8f0f6']
+      : biome === 'lava' ? ['#2a1210', '#5a2a1a', '#8a4a2a', '#c07040']
+      : biome === 'desert' ? ['#5a3a2a', '#8a5a3a', '#bc8a5a', '#e0b888']
+      : ['#3a3548', '#6a6478', '#a49cb4', '#d4cce0'];
+    var x, y;
+    for (y = 0; y < H; y++) for (x = 0; x < W; x++) {
+      var dx = (x + 0.5 - W / 2) / (W / 2), dy = (y + 0.5 - H * 0.65) / (H * 0.65);
+      if (dx * dx + dy * dy <= 1 && y > H * 0.15) setPx(d, W, H, x, y, tonePal(cols, 0.85 - x / W * 0.5 - y / H * 0.2, x, y));
+    }
+    return mkCan(d, W, H);
+  }
+
+  S.sprite = function (kind, variant, biome) {
+    if (BUILD[kind] || SPR[kind]) return asciiSprite(kind);
+    return procVeg(kind, variant == null ? 1 : variant, biome || 'garden');
+  };
+
+  var SKY_DAY = {
+    ocean:  ['#2a70c8', '#4a98d8', '#7ec8f0', '#c0ecff'],
+    forest: ['#3a78d8', '#4a8ae0', '#7ab8f0', '#bfe6ff'],
+    garden: ['#3a80d8', '#58a0e8', '#90d0f8', '#d0f0ff'],
+    desert: ['#4a90d8', '#78b0e0', '#c8d8e8', '#ffe4b8'],
+    tundra: ['#4a80c8', '#6aa0dc', '#a8d0f0', '#e0f0fc'],
+    ice:    ['#5a98e0', '#7ab4ec', '#b8e0f8', '#e8f6ff'],
+    lava:   ['#3a0c0c', '#6a1c10', '#a83814', '#d06020'],
+    storm:  ['#4a6888', '#6a88a8', '#98b0c4', '#c8d8e4']
+  };
+  var SKY_NIGHT = {
+    ocean:  ['#040a18', '#0c1830', '#142848', '#1a3860'],
+    forest: ['#04051a', '#0a1028', '#141a3a', '#1a1a4a'],
+    garden: ['#04051a', '#0a1028', '#141a3a', '#1a1a4a'],
+    desert: ['#050818', '#101028', '#1c1838', '#2a2040'],
+    tundra: ['#040a22', '#0c1428', '#14203a', '#1a2a5a'],
+    ice:    ['#040a22', '#0c1428', '#14203a', '#1a2a5a'],
+    lava:   ['#120404', '#220808', '#3a0e08', '#4a1608'],
+    storm:  ['#080814', '#101020', '#1a1a30', '#24243a']
+  };
+  var SKY_DUSK = {
+    ocean:  ['#2a2a6a', '#5a3a8a', '#c07060', '#ffa060'],
+    forest: ['#4a3a8a', '#6a3a7a', '#e08050', '#ffa060'],
+    garden: ['#4a3a8a', '#6a3a7a', '#e08050', '#ffa060'],
+    desert: ['#5a3a7a', '#8a3a5a', '#ff8850', '#ffc080'],
+    tundra: ['#5a4a9a', '#8a5080', '#ffb0a0', '#ffe0c0'],
+    ice:    ['#5a4a9a', '#8a5080', '#ffb0a0', '#ffe0c0'],
+    lava:   ['#2a0808', '#5a1408', '#a83a12', '#e06020'],
+    storm:  ['#2a2a48', '#4a3a68', '#8a6080', '#c09080']
   };
   var FAR = {
-    ocean:  ['#0a2438','#123044'], forest: ['#0c241c','#163428'], garden: ['#143c28','#1e4c34'],
-    desert: ['#4a2818','#6a3c20'], tundra: ['#1c2834','#2a3844'], ice: ['#203848','#2c4c60'],
-    lava:   ['#1c0c0c','#2c1410'], storm: ['#1c1424','#2a1c30']
+    ocean:  ['#88b8c8', '#6a9aa8', '#4a7a88'],
+    forest: ['#a8c0d8', '#88a8b8', '#5a8a78'],
+    garden: ['#a8d0c8', '#88b8a0', '#5a9a78'],
+    desert: ['#c8c0a8', '#b0a888', '#8a7a58'],
+    tundra: ['#b0c4d4', '#90a8b8', '#708890'],
+    ice:    ['#c0d4e8', '#a0b8d0', '#88a0b8'],
+    lava:   ['#8a3a22', '#6a2a1a', '#4a1a10'],
+    storm:  ['#8a90a0', '#6a7080', '#4a5060']
   };
   var MID = {
-    ocean:  ['#143c30','#1c4c3c'], forest: ['#143828','#1c4a34'], garden: ['#1c5034','#286840'],
-    desert: ['#6a3c20','#8a5028'], tundra: ['#2a3840','#3a4c54'], ice: ['#305060','#406878'],
-    lava:   ['#2c1410','#3c1c14'], storm: ['#2a1c2c','#382838']
+    ocean:  ['#4a9a68', '#2a7a48', '#1a5a34'],
+    forest: ['#5a9a68', '#3a7a48', '#2a5a34'],
+    garden: ['#4aaa60', '#2a8a40', '#1a6a30'],
+    desert: ['#c4a068', '#a08048', '#7a6030'],
+    tundra: ['#7a8a80', '#5a6a64', '#3a4a48'],
+    ice:    ['#90b0c4', '#7090a8', '#507088'],
+    lava:   ['#8a3a24', '#6a2818', '#4a1c10'],
+    storm:  ['#4a5a48', '#3a4a38', '#2a3a28']
   };
   var GRASS = {
-    ocean:  ['#164a24','#226830','#2e8440','#3a9a48'],
-    forest: ['#12481c','#1c6428','#288034','#349c40'],
-    garden: ['#186828','#288838','#3aa848','#58c860'],
-    desert: ['#8a5828','#b07838','#c4944c','#d8b060'],
-    tundra: ['#3a4a34','#54684c','#6a8070','#88a090'],
-    ice:    ['#c0d0dc','#d8e4ec','#e8f0f6','#f6fafc'],
-    lava:   ['#241410','#341c14','#4a2418','#5c2c18'],
-    storm:  ['#3a2c20','#56402c','#6e5438','#8a6a48']
+    ocean:  ['#186828', '#28a040', '#48c058', '#70d878'],
+    forest: ['#1a5820', '#2a7830', '#3c9a40', '#58b850'],
+    garden: ['#228038', '#3aa848', '#58c860', '#7ae070'],
+    desert: ['#8a7a3a', '#b8a050', '#dcc878', '#f0e090'],
+    tundra: ['#4a5a44', '#6a7a64', '#8a9a84', '#a8b8a4'],
+    ice:    ['#c0d0dc', '#d8e4ec', '#e8f0f6', '#f6fafc'],
+    lava:   ['#3a1810', '#5a2414', '#7a3018', '#9a3c1c'],
+    storm:  ['#3a4a38', '#4a5a48', '#5a6a58', '#6a7a68']
   };
   var DIRT = {
-    ocean:  ['#3a2a18','#2a1c10','#4a3420','#1e140c'],
-    forest: ['#2a1c10','#1c1208','#3a2818','#140c08'],
-    garden: ['#3a2414','#2a180c','#4a301c','#1c1008'],
-    desert: ['#6a4018','#4a2c10','#8a5828','#3a200c'],
-    tundra: ['#2a2420','#1c1814','#3a3430','#141210'],
-    ice:    ['#8a9aaa','#6a7a8a','#a8b8c8','#4a5a6a'],
-    lava:   ['#1a0c0c','#100606','#2a1410','#3a1810'],
-    storm:  ['#2a1c14','#1c120c','#3a281c','#140c08']
+    ocean:  ['#5a3e24', '#4a301c', '#3a2414', '#2a180c'],
+    forest: ['#5a3e24', '#4a301c', '#3a2414', '#2a180c'],
+    garden: ['#6a4a28', '#5a3a1c', '#4a2c14', '#2a180c'],
+    desert: ['#c49058', '#a07038', '#8a5828', '#6a4018'],
+    tundra: ['#5a544c', '#4a443c', '#3a3430', '#2a2420'],
+    ice:    ['#8a9aaa', '#6a7a8a', '#5a6a7a', '#4a5a6a'],
+    lava:   ['#3a1810', '#2a1010', '#1c0c0a', '#100606'],
+    storm:  ['#4a3424', '#3a281c', '#2a1c14', '#1c120c']
   };
-  var WATER = ['#0a2048','#123868','#1a5a88','#2a80b0','#48b0d0','#70d0e8'];
+  var WATER = ['#1a5a88', '#2a80b0', '#48b0d0', '#70d0e8', '#a0e4f4'];
   var RINGCOL = { gold:['#e8c868','#c4a040'], ice:['#c0d8e8','#88a8c0'], rose:['#e8a0b0','#c07080'], dust:['#c8b898','#8a7a60'], jade:['#88c898','#408060'], violet:['#b898d0','#685088'] };
+  var CLOUD_PAL = {
+    ocean:  ['#c4d0ea', '#e6ecf8', '#ffffff'],
+    forest: ['#c4d0ea', '#e6ecf8', '#ffffff'],
+    garden: ['#c4d0ea', '#e6ecf8', '#ffffff'],
+    desert: ['#e8d0b0', '#f8ecd8', '#ffffff'],
+    tundra: ['#c0d4f0', '#e4f0ff', '#ffffff'],
+    ice:    ['#c0d4f0', '#e4f0ff', '#ffffff'],
+    lava:   ['#4a2018', '#7a3a28', '#a06048'],
+    storm:  ['#9aa8bc', '#c0c8d8', '#e4e8f0']
+  };
 
   var WALK_F = 0.63, RELIEF_BASE = 8;
   function heightAt(x, seed, land, biome) {
@@ -185,7 +489,8 @@
     return { ground: h, sea: sea };
   }
   function walkLine(H) { return (H * WALK_F) | 0; }
-  function dirtBottom(H, walk) { return Math.min(H, walk + Math.max(22, (H * 0.17) | 0)); }
+  function dirtBottom(H, walk) { return Math.min(H, walk + Math.max(28, (H * 0.22) | 0)); }
+  function wrapDist(a, b) { var d = Math.abs(a - b); return Math.min(d, WORLD - d); }
 
   S.makeWorld = function (planet) {
     var spec = T.cleanSpec(planet);
@@ -194,31 +499,46 @@
     for (var pass = 0; pass < 3; pass++) {
       var h2 = h.slice();
       for (i = 0; i < WORLD; i++) {
-        var l = h[(i + WORLD - 1) % WORLD], r = h[(i + 1) % WORLD];
-        if (h[i] > sea && l <= sea && r <= sea && h[i] - sea < 4) h2[i] = Math.min(l, r);
-        else if (h[i] <= sea && l > sea && r > sea) h2[i] = Math.min(l, r);
+        var l = h[(i + WORLD - 1) % WORLD], rgt = h[(i + 1) % WORLD];
+        if (h[i] > sea && l <= sea && rgt <= sea && h[i] - sea < 4) h2[i] = Math.min(l, rgt);
+        else if (h[i] <= sea && l > sea && rgt > sea) h2[i] = Math.min(l, rgt);
       }
       h = h2;
     }
     var decor = [];
     function kindAt(i) {
       var b = spec.biome, r = T.hash(i, 2, seed);
-      if (b === 'desert') return r < 0.45 ? 'cactus' : (r < 0.8 ? 'saguaro' : (r < 0.92 ? 'bush' : 'bench'));
-      if (b === 'ice') return r < 0.55 ? 'spire' : (r < 0.85 ? 'tallpine' : 'pine');
-      if (b === 'tundra') return r < 0.4 ? 'pine' : (r < 0.7 ? 'tallpine' : (r < 0.88 ? 'tree' : 'bush'));
-      if (b === 'ocean') return r < 0.5 ? 'palm' : (r < 0.75 ? 'bush' : 'tree');
-      if (b === 'lava') return r < 0.4 ? 'spire' : (r < 0.75 ? 'cactus' : 'saguaro');
-      if (b === 'forest') return r < 0.12 ? 'mush' : (r < 0.22 ? 'fern' : (r < 0.4 ? 'tallpine' : (r < 0.55 ? 'pine' : (r < 0.7 ? 'oak' : (r < 0.85 ? 'birch' : 'tree')))));
-      return r < 0.1 ? 'garden' : (r < 0.22 ? 'bush' : (r < 0.38 ? 'oak' : (r < 0.5 ? 'fruit' : (r < 0.62 ? 'willow' : (r < 0.75 ? 'tree' : (r < 0.88 ? 'pine' : 'fern'))))));
+      if (b === 'desert') return r < 0.22 ? 'cactus' : (r < 0.36 ? 'saguaro' : (r < 0.5 ? 'bush' : (r < 0.68 ? 'tuft' : (r < 0.84 ? 'rock' : 'flower'))));
+      if (b === 'ice') return r < 0.3 ? 'spire' : (r < 0.5 ? 'tallpine' : (r < 0.68 ? 'pine' : (r < 0.82 ? 'rock' : 'tuft')));
+      if (b === 'tundra') return r < 0.28 ? 'pine' : (r < 0.46 ? 'tallpine' : (r < 0.6 ? 'bush' : (r < 0.78 ? 'tuft' : 'rock')));
+      if (b === 'ocean') return r < 0.28 ? 'palm' : (r < 0.42 ? 'bush' : (r < 0.58 ? 'tuft' : (r < 0.74 ? 'flower' : (r < 0.88 ? 'rock' : 'tree'))));
+      if (b === 'lava') return r < 0.28 ? 'rock' : (r < 0.48 ? 'spire' : (r < 0.68 ? 'cactus' : (r < 0.84 ? 'saguaro' : 'tuft')));
+      if (b === 'forest') return r < 0.1 ? 'mush' : (r < 0.2 ? 'fern' : (r < 0.32 ? 'tuft' : (r < 0.42 ? 'flower' : (r < 0.52 ? 'bush' : (r < 0.64 ? 'tallpine' : (r < 0.76 ? 'oak' : (r < 0.86 ? 'pine' : 'birch')))))));
+      /* garden */
+      return r < 0.1 ? 'garden' : (r < 0.22 ? 'flower' : (r < 0.36 ? 'bush' : (r < 0.46 ? 'tuft' : (r < 0.54 ? 'mush' : (r < 0.66 ? 'oak' : (r < 0.76 ? 'fruit' : (r < 0.86 ? 'willow' : 'tree')))))));
     }
-    for (i = 0; i < WORLD; i += 5 + (T.hash(i, seed, 3) * 9) | 0) {
+    for (i = 0; i < WORLD; ) {
+      var step = 4 + ((T.hash(i, seed, 3) * 8) | 0);
+      if (h[i] > sea + 1 && T.hash(i, 9, seed) < 0.82 && wrapDist(i, 120) > 20) {
+        decor.push({ kind: kindAt(i), x: i, sc: 1, flip: T.hash(i, 12, seed) > 0.5, v: i });
+      }
+      i += step;
+    }
+    /* extra ground cover so the lip isn't bare between trees */
+    var bfill = spec.biome;
+    for (i = 2; i < WORLD; i += 2 + ((T.hash(i, 21, seed) * 4) | 0)) {
       if (h[i] <= sea + 1) continue;
-      if (T.hash(i, 9, seed) < 0.7) {
-        var rs = T.hash(i, 11, seed);
-        decor.push({ kind: kindAt(i), x: i, sc: 1, flip: T.hash(i, 12, seed) > 0.5 });
+      if (wrapDist(i, 120) < 8) continue;
+      if (T.hash(i, 22, seed) < 0.55) {
+        var rr2 = T.hash(i, 23, seed), fill;
+        if (bfill === 'desert') fill = rr2 < 0.55 ? 'tuft' : (rr2 < 0.85 ? 'rock' : 'flower');
+        else if (bfill === 'lava') fill = rr2 < 0.65 ? 'rock' : 'tuft';
+        else if (bfill === 'ice' || bfill === 'tundra') fill = rr2 < 0.65 ? 'tuft' : 'rock';
+        else if (bfill === 'ocean') fill = rr2 < 0.55 ? 'tuft' : (rr2 < 0.88 ? 'flower' : 'rock');
+        else fill = rr2 < 0.52 ? 'tuft' : (rr2 < 0.88 ? 'flower' : 'mush');
+        decor.push({ kind: fill, x: i, sc: 1, flip: false, v: i + 50 });
       }
     }
-    /* carve a pond / stream when the planet has water, so landed views aren't dry flats */
     var waters = [];
     if (spec.biome !== 'lava' && spec.land < 0.95) {
       var best = 40, bestSum = 1e9, j, s, pondW, drop;
@@ -234,7 +554,6 @@
         h[(best + j) % WORLD] = Math.min(h[(best + j) % WORLD], drop);
       }
       waters.push({ type: 'pond', x: best, w: pondW });
-      /* short stream running out of the pond if there is land enough */
       if (spec.land > 0.35) {
         var dir = T.hash(best, 8, seed) < 0.5 ? 1 : -1, sx = best + (dir > 0 ? pondW : 0), sl = 28 + ((T.hash(best, 9, seed) * 36) | 0);
         for (j = 0; j < sl; j++) {
@@ -392,67 +711,64 @@
     return T.fbm2(wx * freq, 4 + off, seed, 3) * amp + amp * 0.3;
   }
 
+
+  function skyTod(planet, spec) {
+    var t = (planet && (planet.tod || planet.sky || planet.dayNight)) || spec.tod || spec.sky || 'day';
+    if (t === 'night' || t === 'dusk') return t;
+    return 'day';
+  }
+
   S.draw = function (ctx, world, camX, W, H, t) {
-    var spec = world.spec, pal = SKY[spec.biome] || SKY.forest, grass = GRASS[spec.biome] || GRASS.forest;
-    var dirt = DIRT[spec.biome] || DIRT.forest, farC = FAR[spec.biome] || FAR.forest, midC = MID[spec.biome] || MID.forest;
-    var seed = world.seed || spec.seed, biome = spec.biome;
+    var spec = world.spec, biome = spec.biome;
+    var grass = GRASS[biome] || GRASS.forest, dirt = DIRT[biome] || DIRT.forest;
+    var farC = FAR[biome] || FAR.forest, midC = MID[biome] || MID.forest;
+    var seed = world.seed || spec.seed;
     var horizon = walkLine(H);
     var camY = (S.camY | 0);
     camX = camX | 0;
+    var tod = skyTod(world.planet, spec);
+    var skyPal = (tod === 'night' ? SKY_NIGHT : (tod === 'dusk' ? SKY_DUSK : SKY_DAY))[biome] || SKY_DAY.forest;
     var img = ctx.createImageData(W, H), d = img.data;
-    var x, y, i, k, col, c0, c1, hexc;
+    var x, y, i, k, c0, c1;
 
-    /* multi-stop atmosphere sky: deep zenith, pale horizon haze, slight biome tint, Bayer dither */
-    var hsv = (T.planet && T.planet.hsv) ? T.planet.hsv : function (h, s, v) {
-      return [v * 255, v * 255, v * 255];
-    };
-    var hue = (spec.atmoHue == null ? 0.55 : spec.atmoHue);
-    var stops = [], st, nStops = 10, zt, zh, zs, zv;
-    for (st = 0; st < nStops; st++) {
-      zt = st / (nStops - 1);
-      zh = hue + (0.08 * (1 - zt)); /* zenith leans a little bluer */
-      if (zh >= 1) zh -= 1;
-      zs = 0.62 - zt * 0.54;
-      zv = 0.07 + zt * 0.90;
-      if (biome === 'lava') { zs = 0.7 - zt * 0.25; zv = 0.06 + zt * 0.55; }
-      if (biome === 'storm') { zs = 0.45 - zt * 0.2; zv = 0.08 + zt * 0.5; }
-      var rgb = hsv(zh, zs, zv);
-      /* light biome wash in the middle stops only */
-      var bp = T.hex(pal[Math.min(pal.length - 1, (zt * (pal.length - 1)) | 0)]);
-      var bm = (zt > 0.15 && zt < 0.75) ? 0.14 : 0.06;
-      rgb = [
-        (rgb[0] * (1 - bm) + bp[0] * bm) | 0,
-        (rgb[1] * (1 - bm) + bp[1] * bm) | 0,
-        (rgb[2] * (1 - bm) + bp[2] * bm) | 0
-      ];
-      stops.push(rgb);
+    /* bright, airy daytime gradient (or dusk/night if the planet set one) */
+    var nStops = skyPal.length, stops = [], st;
+    for (st = 0; st < nStops; st++) stops.push(T.hex(skyPal[st]));
+    /* light atmo-hue wash, never darkening the zenith */
+    if (tod === 'day' && spec.atmoHue != null && biome !== 'lava') {
+      var hsv = (T.planet && T.planet.hsv) ? T.planet.hsv : function (h, s, v) { return [180, 200, 230]; };
+      var tint = hsv(spec.atmoHue, 0.35, 0.85);
+      for (st = 1; st < nStops - 1; st++) {
+        var bm = 0.10;
+        stops[st] = [
+          (stops[st][0] * (1 - bm) + tint[0] * bm) | 0,
+          (stops[st][1] * (1 - bm) + tint[1] * bm) | 0,
+          (stops[st][2] * (1 - bm) + tint[2] * bm) | 0
+        ];
+      }
     }
-    /* warm / pale horizon haze */
-    var hz = stops[nStops - 1];
-    hz[0] = Math.min(255, hz[0] + (biome === 'desert' || biome === 'lava' ? 36 : 22));
-    hz[1] = Math.min(255, hz[1] + (biome === 'desert' ? 22 : 28));
-    hz[2] = Math.min(255, hz[2] + (biome === 'desert' ? 8 : 32));
-    var sunX = (W * (biome === 'desert' ? 0.62 : 0.74) - camX * 0.06) | 0;
-    var sunY = ((horizon * (biome === 'desert' || biome === 'lava' ? 0.22 : 0.2)) - camY * 0.25) | 0;
-    var sr = biome === 'desert' ? 14 : (biome === 'lava' ? 12 : 10);
-    var bloomR = sr * 7;
+    var sunX = (W * (biome === 'desert' ? 0.28 : 0.22) - camX * 0.06) | 0;
+    var sunY = ((horizon * (biome === 'desert' || biome === 'lava' || tod !== 'day' ? 0.22 : 0.16)) - camY * 0.25) | 0;
+    if (tod === 'night') { sunX = -80; sunY = -80; }
+    var sr = biome === 'desert' ? 11 : (biome === 'lava' ? 10 : 9);
+    var bloomR = sr * 8;
+    var skyHaze = stops[nStops - 1];
     for (y = 0; y < H; y++) {
       var uy = (y + camY * 0.1) / Math.max(1, horizon + 6);
       var si = T.clamp(uy, 0, 1) * (nStops - 1), a = si | 0, f = si - a;
       c0 = stops[Math.min(nStops - 1, a)];
       c1 = stops[Math.min(nStops - 1, a + 1)];
       for (x = 0; x < W; x++) {
-        var ff = f;
-        var rr = (c0[0] + (c1[0] - c0[0]) * ff);
-        var gg = (c0[1] + (c1[1] - c0[1]) * ff);
-        var bb = (c0[2] + (c1[2] - c0[2]) * ff);
-        if (biome !== 'storm') {
+        var rr = (c0[0] + (c1[0] - c0[0]) * f);
+        var gg = (c0[1] + (c1[1] - c0[1]) * f);
+        var bb = (c0[2] + (c1[2] - c0[2]) * f);
+        if (tod !== 'night' && biome !== 'storm') {
           var dist = Math.hypot(x - sunX, y - sunY);
           var bloom = T.clamp(1 - dist / bloomR, 0, 1);
           bloom = bloom * bloom;
           if (bloom > 0.01) {
-            var bc = biome === 'lava' ? [255, 140, 40] : (biome === 'desert' ? [255, 220, 140] : [255, 248, 210]);
-            var bk = bloom * 0.72;
+            var bc = biome === 'lava' ? [255, 140, 40] : (biome === 'desert' || tod === 'dusk' ? [255, 220, 140] : [255, 250, 220]);
+            var bk = bloom * 0.55;
             rr = rr * (1 - bk) + bc[0] * bk;
             gg = gg * (1 - bk) + bc[1] * bk;
             bb = bb * (1 - bk) + bc[2] * bk;
@@ -461,16 +777,14 @@
         put(d, W, H, x, y, rr | 0, gg | 0, bb | 0);
       }
     }
-    var skyHaze = stops[nStops - 1];
 
-    function pset(x, y, rgb) { put(d, W, H, x, y, rgb[0], rgb[1], rgb[2]); }
     function phex(x, y, hex) { var c = T.hex(hex); put(d, W, H, x, y, c[0], c[1], c[2]); }
 
-    /* upper stars / aurora */
-    if (biome === 'tundra' || biome === 'ice' || biome === 'storm' || biome === 'lava' || biome === 'ocean') {
-      for (i = 0; i < 64; i++) {
+    /* stars at night, or a few faint ones at dusk / ice nights */
+    if (tod === 'night' || tod === 'dusk' || biome === 'lava') {
+      for (i = 0; i < (tod === 'night' ? 80 : 36); i++) {
         var sx = ((T.hash(i, 3, seed) * (W + 60) - camX * 0.08) % (W + 60) + (W + 60)) % (W + 60) - 10;
-        var sy = 2 + T.hash(i, 7, seed) * (horizon * 0.42) - camY * 0.2;
+        var sy = 2 + T.hash(i, 7, seed) * (horizon * 0.5) - camY * 0.2;
         var tw = 0.4 + 0.6 * Math.abs(Math.sin(t * (1.1 + i * 0.07) + i));
         if (T.bayer(sx | 0, sy | 0) < tw) phex(sx | 0, sy | 0, tw > 0.85 ? '#ffffff' : (i % 5 ? '#e8f0d8' : '#c8d8ff'));
       }
@@ -478,28 +792,27 @@
     if ((biome === 'ice' || biome === 'tundra') && spec.aurora > 0.05) {
       for (y = 4; y < horizon * 0.45; y++) for (x = 0; x < W; x++) {
         var au = Math.sin((x + camX * 0.2) * 0.03 + t * 0.6) * 0.5 + 0.5;
-        au *= (1 - y / (horizon * 0.45)) * spec.aurora;
+        au *= (1 - y / (horizon * 0.45)) * spec.aurora * (tod === 'day' ? 0.45 : 1);
         if (au > 0.28 && T.bayer(x, y) < au) phex(x, y, y < horizon * 0.2 ? '#80f0a0' : '#6030a0');
       }
     }
-
     ctx.putImageData(img, 0, 0);
 
-    /* sun — soft disk and corona; bloom already lives in the sky gradient */
-    if (biome !== 'storm') {
+    /* sun disc + short pixel rays (hidden at night) */
+    if (tod !== 'night' && biome !== 'storm') {
       var sc0 = T.hex(biome === 'lava' ? '#ffd070' : '#fff8e8');
-      var sc1 = T.hex(biome === 'desert' ? '#ffe08a' : '#ffe6a8');
+      var sc1 = T.hex(biome === 'desert' || tod === 'dusk' ? '#ffe08a' : '#ffe6a8');
       var sc2 = T.hex(biome === 'lava' ? '#e05018' : '#ffb060');
       var breath = T.reduced ? 1 : (0.96 + 0.04 * Math.sin(t * 0.45));
       var cell = Math.max(3, sr * 0.28);
       var img2 = ctx.getImageData(0, 0, W, H), d2 = img2.data;
-      var x0 = Math.max(0, (sunX - sr * 3) | 0), x1 = Math.min(W - 1, (sunX + sr * 3) | 0);
-      var y0 = Math.max(0, (sunY - sr * 3) | 0), y1 = Math.min(H - 1, (sunY + sr * 3) | 0);
-      for (y = y0; y <= y1; y++) for (x = x0; x <= x1; x++) {
-        var dx = x + 0.5 - sunX, dy = y + 0.5 - sunY, rr = Math.hypot(dx, dy);
+      var x0 = Math.max(0, (sunX - sr * 5) | 0), x1 = Math.min(W - 1, (sunX + sr * 5) | 0);
+      var y0s = Math.max(0, (sunY - sr * 5) | 0), y1s = Math.min(H - 1, (sunY + sr * 5) | 0);
+      for (y = y0s; y <= y1s; y++) for (x = x0; x <= x1; x++) {
+        var dx = x + 0.5 - sunX, dy = y + 0.5 - sunY, rad = Math.hypot(dx, dy);
         var o = (y * W + x) * 4;
-        if (rr <= sr) {
-          var nr = rr / sr, nz = Math.sqrt(Math.max(0, 1 - nr * nr));
+        if (rad <= sr) {
+          var nr = rad / sr, nz = Math.sqrt(Math.max(0, 1 - nr * nr));
           var g = T.fbm2(dx / cell, dy / cell, 11, 2);
           var v = 0.35 + nz * 0.55 + (g - 0.5) * 0.08;
           var col = v > 0.62 ? T.mix3(sc1, sc0, (v - 0.62) / 0.38) : T.mix3(sc2, sc1, v / 0.62);
@@ -507,19 +820,28 @@
           if (limb > 0) col = T.mix3(col, sc2, limb * 0.55);
           d2[o] = col[0] | 0; d2[o + 1] = col[1] | 0; d2[o + 2] = col[2] | 0; d2[o + 3] = 255;
         } else {
-          var fall = Math.pow(T.clamp(1 - (rr - sr) / (sr * 2.15), 0, 1), 2.15) * breath;
+          var fall = Math.pow(T.clamp(1 - (rad - sr) / (sr * 2.15), 0, 1), 2.15) * breath;
           if (fall > 0.01) {
-            var a = fall * 0.85;
-            d2[o] = (d2[o] * (1 - a) + sc2[0] * a) | 0;
-            d2[o + 1] = (d2[o + 1] * (1 - a) + sc2[1] * a) | 0;
-            d2[o + 2] = (d2[o + 2] * (1 - a) + sc2[2] * a) | 0;
+            var aa = fall * 0.85;
+            d2[o] = (d2[o] * (1 - aa) + sc2[0] * aa) | 0;
+            d2[o + 1] = (d2[o + 1] * (1 - aa) + sc2[1] * aa) | 0;
+            d2[o + 2] = (d2[o + 2] * (1 - aa) + sc2[2] * aa) | 0;
           }
         }
       }
       ctx.putImageData(img2, 0, 0);
+      /* short pixel rays */
+      if (tod === 'day') {
+        ctx.fillStyle = 'rgba(255,248,220,0.7)';
+        for (i = 0; i < 8; i++) {
+          var ang = i * Math.PI / 4 + 0.2, inner = sr + 3, outer = sr + 7 + (i % 2);
+          ctx.fillRect((sunX + Math.cos(ang) * inner) | 0, (sunY + Math.sin(ang) * inner) | 0, 1, 1);
+          ctx.fillRect((sunX + Math.cos(ang) * (inner + 2)) | 0, (sunY + Math.sin(ang) * (inner + 2)) | 0, 1, 1);
+          if (i % 2 === 0) ctx.fillRect((sunX + Math.cos(ang) * outer) | 0, (sunY + Math.sin(ang) * outer) | 0, 1, 1);
+        }
+      }
     }
 
-    /* rings — big arc across the sky */
     if (spec.rings && spec.rings.length) {
       var rg = RINGCOL[spec.rings[0].color] || RINGCOL.dust;
       var tilt = (spec.rings[0].tilt || 0.4) * 28;
@@ -536,8 +858,6 @@
         }
       }
     }
-
-    /* moons — large in the sky */
     var moons = spec.moons || [];
     for (i = 0; i < moons.length; i++) {
       var m = moons[i], mr = 10 + (m.size || 0.5) * 12;
@@ -556,50 +876,40 @@
       }
     }
 
-    /* shaded, dithered-edge pixel clouds (3–4 tones, lit top, shadowed bottom) */
-    var CLOUD_PAL = biome === 'lava' ? ['#d0a090', '#a07068', '#6a4840', '#3a2820']
-      : biome === 'storm' ? ['#c8c8d8', '#8a8aa0', '#5a5468', '#3a3448']
-      : biome === 'desert' ? ['#fff6e0', '#f0e0c0', '#d4c09a', '#a89070']
-      : biome === 'ice' ? ['#ffffff', '#e8f0f8', '#c8d8e8', '#88a0b8']
-      : ['#f8fcff', '#e4eef4', '#c8d4de', '#8a9eae'];
+    /* soft fluffy multi-tone clouds (Void-style stacked ellipses, lit tops) */
+    var cpal = CLOUD_PAL[biome] || CLOUD_PAL.forest;
     if (!S._clouds) S._clouds = {};
     function cloudSprite(idx) {
-      var key = biome + ':' + seed + ':' + idx;
+      var key = biome + ':' + tod + ':' + seed + ':' + idx;
       if (S._clouds[key]) return S._clouds[key];
-      var w = 34 + ((T.hash(idx, 1, seed) * 30) | 0);
-      var h = 11 + ((T.hash(idx, 2, seed) * 8) | 0);
-      var c = document.createElement('canvas'); c.width = w; c.height = h + 3;
-      var g2 = c.getContext('2d'), bumps = 3 + (idx % 4), discs = [], j;
-      for (j = 0; j < bumps; j++) {
-        var cxb = 5 + (w - 10) * (j + 0.25 * T.hash(idx, 10 + j, seed)) / Math.max(1, bumps - 1);
-        var rb = 3.5 + T.hash(idx, 20 + j, seed) * (h * 0.5);
-        var cyb = h - 1 - rb * 0.3 - T.hash(idx, 30 + j, seed) * 2.5;
-        discs.push({ x: cxb, y: cyb, r: rb });
-      }
-      function inside(px, py) {
-        var k2, dx, dy;
-        for (k2 = 0; k2 < discs.length; k2++) {
-          dx = px - discs[k2].x; dy = py - discs[k2].y;
-          if (dx * dx + dy * dy <= discs[k2].r * discs[k2].r) return 1;
+      var r = rngAt(idx, 40, seed);
+      var w = 40 + ((r() * 50) | 0), h = 14 + ((r() * 10) | 0);
+      var cd = alloc(w, h), n = 4 + ((r() * 4) | 0), ci;
+      for (ci = 0; ci < n; ci++) {
+        var cxb = w * (0.18 + 0.64 * (n === 1 ? 0.5 : ci / (n - 1)));
+        var rx = w * (0.14 + r() * 0.1), ry = h * (0.3 + r() * 0.22);
+        var cyb = h * 0.62 - r() * h * 0.15;
+        var px, py, dx, dy;
+        for (py = Math.floor(cyb - ry); py <= Math.ceil(cyb + ry); py++) {
+          for (px = Math.floor(cxb - rx); px <= Math.ceil(cxb + rx); px++) {
+            dx = (px + 0.5 - cxb) / rx; dy = (py + 0.5 - cyb) / ry;
+            if (dx * dx + dy * dy <= 1) {
+              var v = (1 - dy) * 0.55 + 0.25 - (py > h * 0.7 ? 0.25 : 0);
+              setPx(cd, w, h, px, py, tonePal(cpal, v, px, py));
+            }
+          }
         }
-        return 0;
       }
-      var px, py, edge, tn, col;
-      for (py = 0; py < h + 3; py++) for (px = 0; px < w; px++) {
-        if (!inside(px, py)) continue;
-        edge = !inside(px - 1, py) || !inside(px + 1, py) || !inside(px, py - 1) || !inside(px, py + 1);
-        if (edge && T.bayer(px + idx, py) < 0.4) continue;
-        tn = py / Math.max(1, h);
-        col = tn < 0.22 ? CLOUD_PAL[0] : tn < 0.48 ? CLOUD_PAL[1] : tn < 0.74 ? CLOUD_PAL[2] : CLOUD_PAL[3];
-        if (edge && tn < 0.45) col = CLOUD_PAL[1];
-        if (!edge && tn < 0.18 && px < w * 0.55) col = CLOUD_PAL[0];
-        g2.fillStyle = col; g2.fillRect(px, py, 1, 1);
+      /* flatten the very bottom so they don't look like hard slabs */
+      for (px = 0; px < w; px++) for (py = Math.floor(h * 0.82); py < h; py++) {
+        var o = (py * w + px) * 4; cd[o + 3] = 0;
       }
-      return (S._clouds[key] = c);
+      return (S._clouds[key] = mkCan(cd, w, h));
     }
     function drawCloudLayer(count, par, y0, ySpan, speed) {
       var ci, spr, cx, cy, n = count;
       if (spec.clouds < 0.05 && biome !== 'storm') n = Math.max(2, (count * 0.35) | 0);
+      if (tod === 'night') n = Math.max(1, (n * 0.5) | 0);
       for (ci = 0; ci < n; ci++) {
         spr = cloudSprite(ci + ((par * 10) | 0));
         cx = ((T.hash(ci, 11 + par * 9, seed) * (W + spr.width + 80) + t * speed * (0.35 + spec.clouds * 0.45) - camX * par) % (W + spr.width + 80) + (W + spr.width + 80)) % (W + spr.width + 80) - spr.width;
@@ -608,22 +918,26 @@
         ctx.drawImage(spr, cx | 0, cy | 0);
       }
     }
-    drawCloudLayer(7, 0.10, 2, horizon * 0.14, 1.1);
+    drawCloudLayer(6, 0.08, 4, horizon * 0.16, 1.1);
 
-    /* mountains: slope shading, ridgelines, snow/rock, atmospheric perspective */
+    /* layered atmospheric ranges — noise-shaded, no flat rectangles */
     function asRgb(c) {
       if (!c) return [0, 0, 0];
       if (typeof c !== 'string') return c;
       if (c.charAt(0) === 'r') { var m = c.match(/(\d+)/g); return m ? [+m[0], +m[1], +m[2]] : [0, 0, 0]; }
       return T.hex(c);
     }
-    function mixRgb(a, b, k) {
+    function mix3(a, b, k) {
       a = asRgb(a); b = asRgb(b);
-      return 'rgb(' + ((a[0] * (1 - k) + b[0] * k) | 0) + ',' + ((a[1] * (1 - k) + b[1] * k) | 0) + ',' + ((a[2] * (1 - k) + b[2] * k) | 0) + ')';
+      return [(a[0] * (1 - k) + b[0] * k) | 0, (a[1] * (1 - k) + b[1] * k) | 0, (a[2] * (1 - k) + b[2] * k) | 0];
     }
+
+    img = ctx.getImageData(0, 0, W, H); d = img.data;
+
     function drawRange(par, yBase, cols, amp, freq, off, haze) {
       var hx, top, hh, hs = new Float32Array(W), sunRight = sunX > W * 0.5;
-      var lit = cols[1] || cols[0], midt = cols[0], shade = cols[0], snowOn = (biome === 'ice' || biome === 'tundra' || (biome !== 'desert' && biome !== 'lava' && amp > 24));
+      var snowOn = (biome === 'ice' || biome === 'tundra' || (biome !== 'desert' && biome !== 'lava' && amp > 24));
+      var ramp = cols.map(function (c) { return asRgb(c); });
       for (hx = 0; hx < W; hx++) {
         hh = hillH(camX * par + hx, seed, freq, amp, off);
         if (biome === 'ice' || biome === 'tundra') hh += Math.max(0, T.ridged3((camX * par + hx) * 0.02, 2, 0, seed, 2) * amp * 0.55 - amp * 0.12);
@@ -635,84 +949,44 @@
         var bow = Math.pow((hx + 0.5) / W * 2 - 1, 2) * (H * (0.04 + haze * 0.22));
         top = (yBase - hh - camY * par + bow) | 0;
         var slope = hh - (hx ? hs[hx - 1] : hh);
-        var facing = sunRight ? (slope < -0.2) : (slope > 0.2);
-        var ridge = hh >= (hx ? hs[hx - 1] : 0) && hh >= (hx < W - 1 ? hs[hx + 1] : 0) && hh > amp * 0.4;
+        var facing = sunRight ? (slope < -0.25) : (slope > 0.25);
         var fillH = Math.max(1, (horizon + camY + 8) - top);
         if (top >= H) continue;
-        var y2, rel, col;
+        var y2, rel, col, v;
         for (y2 = 0; y2 < fillH; y2++) {
           if (top + y2 < 0 || top + y2 >= H) continue;
           rel = y2 / fillH;
-          if (facing) col = rel < 0.18 ? lit : (rel < 0.55 ? midt : shade);
-          else col = rel < 0.12 ? midt : shade;
-          if (T.bayer(hx, top + y2) < 0.28 && rel > 0.2) col = facing ? shade : midt;
-          if (haze > 0.02) col = mixRgb(col, skyHaze, haze * (0.45 + rel * 0.35));
-          else if (typeof col !== 'string' || col.charAt(0) === '#') { ctx.fillStyle = col; }
-          ctx.fillStyle = (typeof col === 'string') ? col : mixRgb(col, col, 0);
-          ctx.fillRect(hx, top + y2, 1, 1);
+          v = 0.62 - rel * 0.45 + (facing ? 0.12 : -0.08) + (T.hash(hx + (camX * par) | 0, top + y2, seed) - 0.5) * 0.16;
+          if (y2 === 0) v += 0.18;
+          col = T.hex(tonePal(ramp.map(asHex), v, hx, top + y2));
+          if (haze > 0.02) col = mix3(col, skyHaze, haze * (0.5 + rel * 0.35));
+          put(d, W, H, hx, top + y2, col[0], col[1], col[2]);
         }
-        if (ridge && haze < 0.3) {
-          ctx.fillStyle = mixRgb(lit, midt, 0.28);
-          ctx.fillRect(hx, top, 1, 1);
-        }
-        if (snowOn && haze < 0.35 && hh > amp * 0.62 && y2) {
-          var cap = 1 + ((hh - amp * 0.62) / 10) | 0;
-          ctx.fillStyle = biome === 'lava' ? '#c8b8a8' : mixRgb(lit, '#e8eef4', 0.45);
-          for (y2 = 0; y2 < cap; y2++) if (T.bayer(hx, top + y2) < 0.7) ctx.fillRect(hx, top + y2, 1, 1);
-        }
-        if (biome === 'desert' && T.hash((camX * par + hx) | 0, (top / 6) | 0, seed) < 0.08) {
-          ctx.fillStyle = '#8a6a48'; ctx.fillRect(hx, top + 4 + ((T.hash(hx, 3, seed) * 8) | 0), 1, 2);
+        if (snowOn && haze < 0.45 && hh > amp * 0.58) {
+          var cap = 1 + ((hh - amp * 0.58) / 10) | 0;
+          for (y2 = 0; y2 < cap; y2++) if (T.bayer(hx, top + y2) < 0.75) {
+            var sc = mix3(skyHaze, [235, 242, 255], 0.7);
+            put(d, W, H, hx, top + y2, sc[0], sc[1], sc[2]);
+          }
         }
       }
     }
-    var farLit = mixRgb(farC[1] || farC[0], skyHaze, 0.2);
-    var midLit = mixRgb(midC[1] || midC[0], skyHaze, 0.08);
-    drawRange(0.10, horizon - 36, [mixRgb(farC[0], skyHaze, 0.42), farLit], 38, 0.014, 2, 0.62);
-    drawCloudLayer(5, 0.16, 2, Math.max(8, horizon * 0.16), 1.6);
-    drawRange(0.26, horizon - 18, [mixRgb(midC[0], skyHaze, 0.16), midLit], 26, 0.024, 5, 0.22);
-
-    drawRange(0.48, horizon - 6, [midC[1] || grass[0], grass[1] || grass[0]], 14, 0.038, 9, 0.06);
-
-    /* landmark silhouettes on the mid range */
-    for (i = 0; i < 8; i++) {
-      var lx = ((T.hash(i, 70, seed) * WORLD - camX * 0.26) % WORLD + WORLD) % WORLD;
-      var lsx = wrapX(lx, camX * 0.26, W);
-      if (lsx < -20 || lsx > W + 20) continue;
-      var lbase = (horizon - 18 - hillH(lx, seed, 0.024, 26, 5) - camY * 0.26) | 0;
-      ctx.fillStyle = midC[0];
-      var lw, lh, ly;
-      if (biome === 'desert') {
-        for (lw = 0; lw < 18; lw++) { lh = 8 + ((lw > 3 && lw < 15) ? 10 : 0); ctx.fillRect((lsx + lw) | 0, lbase - lh, 1, lh); }
-      } else if (biome === 'lava') {
-        for (ly = 0; ly < 22; ly++) ctx.fillRect((lsx + (ly < 8 ? 3 : 1)) | 0, lbase - 22 + ly, ly < 8 ? 5 : 9, 1);
-        ctx.fillStyle = '#c04010'; ctx.fillRect((lsx + 4) | 0, lbase - 24, 3, 3);
-      } else if (biome === 'ice' || biome === 'tundra') {
-        for (ly = 0; ly < 20; ly++) ctx.fillRect((lsx + 8 - (ly / 3) | 0) | 0, lbase - 20 + ly, 2 + ((ly / 3) | 0) * 2, 1);
-        ctx.fillStyle = '#e8f0f8'; ctx.fillRect((lsx + 7) | 0, lbase - 20, 3, 2);
-      } else {
-        /* pine cluster */
-        for (lw = 0; lw < 3; lw++) {
-          var ph = 10 + lw * 4;
-          for (ly = 0; ly < ph; ly++) ctx.fillRect((lsx + lw * 7 + 4 - (ly / 4) | 0) | 0, lbase - ph + ly, 1 + ((ly / 4) | 0) * 2, 1);
-        }
-      }
-    }
-
-    /* a few mid-sky clouds, kept above the mountain line */
-    drawCloudLayer(4, 0.28, horizon * 0.10, horizon * 0.14, 2.1);
-
-    /* water in valleys only, then a short clean ground / strata strip */
+    drawRange(0.10, horizon - 36, farC, 38, 0.014, 2, 0.58);
+    ctx.putImageData(img, 0, 0);
+    drawCloudLayer(5, 0.16, 6, Math.max(8, horizon * 0.18), 1.5);
     img = ctx.getImageData(0, 0, W, H); d = img.data;
+    drawRange(0.26, horizon - 18, midC, 26, 0.024, 5, 0.22);
+    drawRange(0.48, horizon - 6, [midC[1] || grass[0], grass[1] || grass[0], grass[0]], 14, 0.038, 9, 0.06);
+
+    /* water, thick grass lip, dithered soil with depth — no flat horizontal stripes */
     var seaY = (horizon - (world.sea - RELIEF_BASE) + camY) | 0;
     var stripEnd = dirtBottom(H, horizon) + camY;
-    var bed = Math.max(5, ((stripEnd - (horizon + camY)) / 4) | 0);
     var wind = Math.sin(t * 0.7);
     for (x = 0; x < W; x++) {
       var wi = ((Math.floor(camX + x) % WORLD) + WORLD) % WORLD;
       var gh = world.h[wi], gy = (horizon - (gh - RELIEF_BASE) + camY) | 0, wet = gh <= world.sea + 0.5;
-      var floor = gy;
       if (wet) {
-        var top = seaY, bot = Math.min(stripEnd, Math.max(floor, seaY + 1));
+        var top = seaY, bot = Math.min(stripEnd, Math.max(gy, seaY + 1));
         var wx = camX + x, foamy = Math.sin(wx * 0.2 + t * 2.2) * 0.5 + 0.5;
         var hh = 1 + ((Math.sin(wx * 0.35 + t * 0.9) + 1) * 0.8) | 0;
         if (biome !== 'lava' && top - hh >= 0) {
@@ -727,10 +1001,9 @@
           if (biome === 'lava') wc = T.bayer(x, y) < 0.4 ? T.hex('#c04010') : T.hex('#6a1808');
           else if (biome === 'ice') wc = T.bayer(x, y) < 0.5 ? T.hex('#b0d0e8') : T.hex(WATER[wii]);
           else wc = T.hex(WATER[Math.min(WATER.length - 1, wii + (shimmer > 0.6 && T.bayer(x, y) < 0.5 ? 1 : 0))]);
-          /* sky reflection */
-          var ry = top - (y - top) - 1;
-          if (ry >= 0 && ry < H && biome !== 'lava') {
-            var ro = (ry * W + x) * 4;
+          var rfy = top - (y - top) - 1;
+          if (rfy >= 0 && rfy < H && biome !== 'lava') {
+            var ro = (rfy * W + x) * 4;
             var rk = 0.38 + (shimmer > 0 ? 0.12 : 0);
             wc = [wc[0] * (1 - rk) + d[ro] * rk, wc[1] * (1 - rk) + d[ro + 1] * rk, wc[2] * (1 - rk) + d[ro + 2] * rk];
           }
@@ -738,99 +1011,93 @@
         }
       }
       if (gy >= H) continue;
-      var dirtStart = wet ? gy : gy + 3;
       var pv = T.samplePaint(spec, (wi / WORLD) * T.TAU, 0.05);
+      var topT = (biome === 'desert' || biome === 'ice' ? 3 : 5) + (T.hash(wi, 4, seed) > 0.65 ? 1 : 0);
       if (!wet) {
-        var gi = (T.hash(wi, 4, seed) * grass.length) | 0;
-        var gc = T.hex(grass[gi]);
-        if (pv && T.PAINT_PAL[pv]) {
-          var pc = T.hex(T.PAINT_PAL[pv]);
-          gc = [(gc[0] * 0.4 + pc[0] * 0.6) | 0, (gc[1] * 0.4 + pc[1] * 0.6) | 0, (gc[2] * 0.4 + pc[2] * 0.6) | 0];
+        var sway = (!T.reduced && biome !== 'ice' && biome !== 'desert') ? ((wind + Math.sin(t * 0.8 + wi * 0.2)) > 0.55 ? 1 : 0) : 0;
+        for (y = gy; y < gy + topT && y < H; y++) {
+          var dn = y - gy;
+          var gv = 0.95 - dn / (topT + 1) * 0.55 + (T.hash(wi, y, seed) - 0.5) * 0.45;
+          if (dn === 0) gv = 1;
+          var gc = T.hex(tonePal(grass, gv, x, y));
+          if (pv && T.PAINT_PAL[pv]) {
+            var pc = T.hex(T.PAINT_PAL[pv]);
+            gc = [(gc[0] * 0.45 + pc[0] * 0.55) | 0, (gc[1] * 0.45 + pc[1] * 0.55) | 0, (gc[2] * 0.45 + pc[2] * 0.55) | 0];
+          }
+          put(d, W, H, x, y, gc[0], gc[1], gc[2]);
         }
-        for (y = gy; y < dirtStart && y < H; y++) put(d, W, H, x, y, gc[0], gc[1], gc[2]);
-        var sway = (!T.reduced && (biome !== 'ice' && biome !== 'desert')) ? ((wind + Math.sin(t * 0.8 + wi * 0.2)) > 0.55 ? 1 : 0) : 0;
+        /* tufts poking above the lip */
         if (biome === 'ice' || biome === 'tundra') {
-          if (T.hash(wi, 8, seed) < 0.28) put(d, W, H, x, gy - 1, 255, 255, 255);
+          if (T.hash(wi, 8, seed) < 0.3) put(d, W, H, x, gy - 1, 255, 255, 255);
         } else if (biome === 'lava') {
           if (T.hash(wi, 8, seed) < 0.14) { var lv = T.bayer(x, (t * 2) | 0) < 0.5 ? [255, 96, 24] : [192, 48, 16]; put(d, W, H, x, gy, lv[0], lv[1], lv[2]); }
         } else if (biome === 'desert') {
-          if (T.hash(wi, 8, seed) < 0.18) put(d, W, H, x, gy, 224, 192, 112);
+          if (T.hash(wi, 8, seed) < 0.2) put(d, W, H, x, gy, 232, 200, 120);
         } else {
-          if (T.hash(wi, 8, seed) < 0.62) {
+          if (T.hash(wi, 8, seed) < 0.7) {
             var blade = T.hex(grass[grass.length - 1]);
-            put(d, W, H, x + sway, gy - 1, blade[0], blade[1], blade[2]);
-            if (T.hash(wi, 9, seed) < 0.35) put(d, W, H, x + sway, gy - 2, blade[0], blade[1], blade[2]);
-          }
-          if (T.hash(wi, 19, seed) < 0.12) {
-            var fl = T.hex(['#e070a0', '#f0d040', '#4060c0', '#ffffff'][(T.hash(wi, 20, seed) * 4) | 0]);
-            put(d, W, H, x + sway, gy - 3, fl[0], fl[1], fl[2]);
+            var bh = T.hash(wi, 9, seed) < 0.4 ? 3 : (T.hash(wi, 9, seed) < 0.75 ? 2 : 1);
+            for (k = 1; k <= bh; k++) put(d, W, H, x + (k > 1 ? sway : 0), gy - k, blade[0], blade[1], blade[2]);
           }
         }
       }
-      /* four clean dithered beds, then a solid dark floor — no per-pixel speckles */
+      var dirtStart = wet ? gy : gy + topT;
       var yMax = Math.min(H, Math.max(dirtStart, stripEnd));
       for (y = Math.max(dirtStart, 0); y < yMax; y++) {
         var depth = y - dirtStart;
-        var layer = Math.min(dirt.length - 1, Math.max(0, (depth / bed) | 0));
-        var dc = T.hex(dirt[layer]);
-        var edge = depth % bed;
-        if (edge === 0 && layer > 0 && T.bayer(x, y) < 0.55) dc = T.hex(dirt[layer - 1]);
-        else if (edge === 1 && T.bayer(x + 2, y) < 0.3) dc = T.hex(dirt[Math.min(dirt.length - 1, layer + 1)]);
+        var fn = T.fbm2(wi * 0.07, y * 0.09, seed + 7, 2);
+        var v = 0.72 - Math.min(depth, 80) / 80 * 0.42 + (fn - 0.5) * 0.7;
+        /* faint irregular beds, not flat screen-wide stripes */
+        if ((((y + ((T.fbm2(wi * 0.02, 3, seed, 2) * 5) | 0)) / 9) | 0) % 5 === 0) v -= 0.10;
+        var dc = T.hex(tonePal(dirt, v, x, y));
         put(d, W, H, x, y, dc[0], dc[1], dc[2]);
       }
-      /* solid dark bed under the cutaway */
       var dark = T.hex(dirt[dirt.length - 1]);
-      for (y = Math.max(yMax, 0); y < H; y++) put(d, W, H, x, y, (dark[0] * 0.7) | 0, (dark[1] * 0.7) | 0, (dark[2] * 0.7) | 0);
+      for (y = Math.max(yMax, 0); y < H; y++) {
+        var dv = 0.35 - (y - yMax) / Math.max(1, H - yMax) * 0.15;
+        put(d, W, H, x, y, (dark[0] * dv * 2) | 0, (dark[1] * dv * 2) | 0, (dark[2] * dv * 2) | 0);
+      }
     }
-    /* sparse intentional stones, roots, fossils, ore — clustered, not noisy */
     function mark(px, py, hex) { var c = T.hex(hex); put(d, W, H, px, py, c[0], c[1], c[2]); }
-    for (i = 0; i < 28; i++) {
+    /* pebbles */
+    for (i = 0; i < 36; i++) {
       var sx = ((T.hash(i, 99, seed) * WORLD) | 0);
       var screenX = wrapX(sx, camX, W);
       if (screenX < 1 || screenX >= W - 2) continue;
       var sgy = (horizon - (world.h[sx | 0] - RELIEF_BASE) + camY) | 0;
-      var sy = sgy + 6 + ((T.hash(i, 100, seed) * 14) | 0);
-      if (sy >= stripEnd - 2 || sy <= sgy + 3) continue;
-      var stc = ['#6a5a48', '#8a7a68', '#4a3a30'][i % 3];
+      var sy = sgy + 7 + ((T.hash(i, 100, seed) * 18) | 0);
+      if (sy >= stripEnd - 2 || sy <= sgy + 4) continue;
+      var stc = biome === 'ice' ? ['#8aa0b0', '#c0d0dc', '#6a7a8a'][i % 3] : ['#6a5a48', '#8a7a68', '#4a3a30'][i % 3];
       mark(screenX | 0, sy, stc); mark((screenX + 1) | 0, sy, stc);
       mark(screenX | 0, sy + 1, stc); if (i % 3) mark((screenX + 1) | 0, sy + 1, '#3a2e24');
     }
+    /* ore flecks */
     for (i = 0; i < 16; i++) {
       var ox = ((T.hash(i, 41, seed) * WORLD) | 0);
       var osx = wrapX(ox, camX, W);
       if (osx < 0 || osx >= W) continue;
       var ogy = (horizon - (world.h[ox | 0] - RELIEF_BASE) + camY) | 0;
-      var oy = ogy + 8 + ((T.hash(i, 42, seed) * 12) | 0);
+      var oy = ogy + 10 + ((T.hash(i, 42, seed) * 14) | 0);
       if (oy >= stripEnd - 1) continue;
       mark(osx | 0, oy, biome === 'lava' ? '#ff8018' : (i % 2 ? '#e8c868' : '#80d0e8'));
       if (i % 2 === 0) mark((osx + 1) | 0, oy, biome === 'lava' ? '#ffd040' : '#fff0a0');
     }
-    for (i = 0; i < 10; i++) {
+    /* roots snaking down from the grass lip */
+    for (i = 0; i < 14; i++) {
       var rxi = ((T.hash(i, 77, seed) * WORLD) | 0);
       var rsx = wrapX(rxi, camX, W);
       if (rsx < 0 || rsx >= W) continue;
       var rgy = (horizon - (world.h[rxi] - RELIEF_BASE) + camY) | 0;
-      for (k = 0; k < 8; k++) {
-        if (rgy + 4 + k >= stripEnd) break;
-        mark((rsx + ((k / 3) | 0) * ((i % 2) ? 1 : -1)) | 0, rgy + 4 + k, k % 3 ? '#3a2410' : '#2a4a20');
-      }
-    }
-    for (i = 0; i < 5; i++) {
-      var fxi = ((T.hash(i, 61, seed) * WORLD) | 0);
-      var fsx = wrapX(fxi, camX, W);
-      var fgy = ((horizon - (world.h[fxi] - RELIEF_BASE) + camY) | 0) + 12;
-      if (fgy + 2 < stripEnd && fsx > 1 && fsx < W - 5) {
-        mark(fsx | 0, fgy, '#d8d0c0'); mark((fsx + 1) | 0, fgy, '#e8e0d0');
-        mark((fsx + 2) | 0, fgy + 1, '#d8d0c0'); mark((fsx + 3) | 0, fgy, '#c8c0b0');
-        mark((fsx + 4) | 0, fgy - 1, '#d8d0c0');
+      for (k = 0; k < 10; k++) {
+        if (rgy + 5 + k >= stripEnd) break;
+        mark((rsx + ((k / 3) | 0) * ((i % 2) ? 1 : -1)) | 0, rgy + 5 + k, k % 3 ? '#3a2410' : '#2a4a20');
       }
     }
     ctx.putImageData(img, 0, 0);
 
-    function blitAt(kind, worldX, footY, sc, flip) {
-      var spr = sprite(kind), sx = wrapX(worldX, camX, W);
-      /* always 1:1 with the surface canvas — never upscale a small sprite into chunky blocks */
-      if (sx < -40 || sx > W + 40) return;
+    function blitAt(kind, worldX, footY, flip, variant) {
+      var spr = S.sprite(kind, variant == null ? worldX : variant, biome), sx = wrapX(worldX, camX, W);
+      if (sx < -50 || sx > W + 50) return;
       var dw = spr.width, dh = spr.height;
       var dx = Math.round(sx - dw / 2), dy = Math.round(footY - dh);
       ctx.imageSmoothingEnabled = false;
@@ -848,16 +1115,17 @@
     if (world.planet.builds) for (i = 0; i < world.planet.builds.length; i++) items.push(world.planet.builds[i]);
     if (world.planet.gifts) for (i = 0; i < world.planet.gifts.length; i++) items.push(world.planet.gifts[i]);
     items.sort(function (a, b) { return a.x - b.x; });
+    /* draw tall vegetation first, then the player later so they are never hidden */
     for (i = 0; i < items.length; i++) {
       var it = items[i], ix = ((it.x % WORLD) + WORLD) % WORLD, iy = groundY(world, ix, H, horizon) + camY;
       if (world.h[ix | 0] <= world.sea + 0.5 && it.kind !== 'print') iy = horizon - (world.sea - RELIEF_BASE) + camY;
-      blitAt(it.kind, ix, iy, 1, it.flip);
+      blitAt(it.kind, ix, iy, it.flip, it.v != null ? it.v : ix);
     }
 
-    /* ambient life, wind, critters, motes — SoT-level density */
+    /* ambient life — dt/time based, biome-tinted */
     if (!T.reduced) {
       if (biome === 'garden' || biome === 'forest' || biome === 'ocean') {
-        for (i = 0; i < 16; i++) {
+        for (i = 0; i < 14; i++) {
           var bx = wrapX((T.hash(i, 30, seed) * WORLD + t * (5 + i * 1.4)) % WORLD, camX, W);
           var by = horizon * 0.22 + Math.sin(t * 0.55 + i) * 8 + T.hash(i, 31, seed) * 32 - camY * 0.3;
           var wing = ((t * 4 + i) | 0) % 2;
@@ -865,7 +1133,6 @@
           ctx.fillRect(bx | 0, by | 0, 3, 1);
           ctx.fillRect((bx | 0) + (wing ? 3 : -2), (by | 0) - 1, 2, 1);
         }
-        /* dragonflies */
         for (i = 0; i < 4; i++) {
           var dx2 = wrapX((T.hash(i, 55, seed) * WORLD + t * 7) % WORLD, camX, W);
           var dy2 = horizon * 0.48 + Math.sin(t * 0.7 + i) * 5 - camY * 0.25;
@@ -877,7 +1144,7 @@
         }
       }
       if (biome === 'garden' || biome === 'forest') {
-        for (i = 0; i < 36; i++) {
+        for (i = 0; i < 28; i++) {
           var fx = wrapX((T.hash(i, 40, seed) * WORLD + Math.sin(t * 0.8 + i) * 10 + t * 8) % WORLD, camX, W);
           var fy = horizon - 10 - T.hash(i, 41, seed) * 50 + Math.sin(t * 0.7 + i * 1.3) * 5 + camY;
           if ((Math.sin(t * 1.6 + i * 2) + 1) * 0.5 > 0.22) {
@@ -886,7 +1153,6 @@
           }
         }
       }
-      /* fish in water */
       if (biome !== 'lava') {
         for (i = 0; i < 8; i++) {
           var fix = (T.hash(i, 73, seed) * WORLD + t * (2.4 + i * 0.25)) % WORLD;
@@ -898,15 +1164,14 @@
           ctx.fillRect((fsx + (((t * 2 + i) | 0) % 2 ? 4 : -1)) | 0, fsy | 0, 1, 1);
         }
       }
-      /* ground critters */
       if (biome !== 'lava') {
         for (i = 0; i < 8; i++) {
           var cx2 = (T.hash(i, 88, seed) * WORLD + t * (2.5 + i * 0.8) * (i % 2 ? 1 : -1) + WORLD) % WORLD;
           if (world.h[cx2 | 0] <= world.sea + 0.5) continue;
           var cy2 = groundY(world, cx2, H, horizon) + camY - (i % 3 === 0 ? 3 : 2);
           var csx = wrapX(cx2, camX, W);
-          ctx.fillStyle = i % 3 === 0 ? '#c8b090' : (biome === 'ice' ? '#d0d8e0' : '#2a1a10');
-          if (i % 3 === 0) { /* bunny */
+          ctx.fillStyle = i % 3 === 0 ? '#c8b090' : (biome === 'ice' ? '#d0d8e0' : (biome === 'desert' ? '#c4a06a' : '#2a1a10'));
+          if (i % 3 === 0) {
             ctx.fillRect(csx | 0, cy2 | 0, 4, 3);
             ctx.fillRect((csx + 1) | 0, (cy2 - 2) | 0, 1, 2);
             ctx.fillRect((csx + 3) | 0, (cy2 - 2) | 0, 1, 2);
@@ -914,21 +1179,6 @@
             ctx.fillRect(csx | 0, cy2 | 0, 3, 2);
             ctx.fillRect((csx + (((t * 2.5 + i) | 0) % 2)) | 0, (cy2 + 2) | 0, 1, 1);
           }
-        }
-      }
-      /* wind streaks + falling leaves / motes */
-      for (i = 0; i < 10; i++) {
-        var wx2 = wrapX((T.hash(i, 66, seed) * WORLD + t * 10) % WORLD, camX, W);
-        var wy2 = 8 + T.hash(i, 67, seed) * (horizon * 0.55) - camY * 0.2;
-        ctx.fillStyle = 'rgba(255,255,255,0.4)';
-        ctx.fillRect(wx2 | 0, wy2 | 0, 5 + (i % 3), 1);
-      }
-      if (biome === 'garden' || biome === 'forest') {
-        for (i = 0; i < 14; i++) {
-          var lx = wrapX((T.hash(i, 81, seed) * WORLD + t * (1.8 + (i % 5) * 0.3) + Math.sin(t * 0.5 + i) * 8) % WORLD, camX, W);
-          var ly = ((T.hash(i, 82, seed) * horizon + t * (3 + i * 0.25)) % (horizon + 8)) + camY * 0.2;
-          ctx.fillStyle = i % 2 ? '#3a8a34' : '#c05030';
-          ctx.fillRect(lx | 0, ly | 0, 2, 1);
         }
       }
       if (biome === 'lava') {
@@ -961,8 +1211,6 @@
     }
     if (S.landT > 0.25) drawPlayer(ctx, ppx, ppy, t);
 
-    /* no canvas-bottom grass under the toolbar — tufts live on the walkable horizon only */
-
     for (i = 0; i < S.fx.length; i++) {
       var p = S.fx[i], pxp = wrapX(p.x, camX, W);
       if (pxp < -2 || pxp > W + 2) continue;
@@ -970,11 +1218,10 @@
       ctx.fillRect(pxp | 0, (p.y + camY) | 0, 1, 1);
     }
 
-    /* landing cinematic: atmosphere veil + rushing clouds */
     if (S.landT < 1) {
       var u = S.landT, veil = u < 0.45 ? (1 - u / 0.45) : 0;
       if (veil > 0) {
-        var ac = T.hex((SKY[biome] || SKY.forest)[3] || '#2a6040');
+        var ac = skyHaze;
         ctx.fillStyle = 'rgba(' + ac[0] + ',' + ac[1] + ',' + ac[2] + ',' + (veil * 0.75).toFixed(3) + ')';
         ctx.fillRect(0, 0, W, H);
       }
@@ -997,10 +1244,10 @@
   };
 
   S.nearGift = function (world) {
-    var g = world.planet.gifts || [], i, best = null, d;
+    var g = world.planet.gifts || [], i, best = null, dd;
     for (i = 0; i < g.length; i++) {
-      d = Math.min(Math.abs(g[i].x - player.x), WORLD - Math.abs(g[i].x - player.x));
-      if (d < 12 && (!best || d < best.d)) best = { g: g[i], d: d };
+      dd = Math.min(Math.abs(g[i].x - player.x), WORLD - Math.abs(g[i].x - player.x));
+      if (dd < 12 && (!best || dd < best.d)) best = { g: g[i], d: dd };
     }
     return best && best.g;
   };
