@@ -215,7 +215,7 @@
       if (h[i] <= sea + 1) continue;
       if (T.hash(i, 9, seed) < 0.7) {
         var rs = T.hash(i, 11, seed);
-        decor.push({ kind: kindAt(i), x: i, sc: rs < 0.18 ? 3 : (rs < 0.7 ? 2 : 1), flip: T.hash(i, 12, seed) > 0.5 });
+        decor.push({ kind: kindAt(i), x: i, sc: 1, flip: T.hash(i, 12, seed) > 0.5 });
       }
     }
     /* carve a pond / stream when the planet has water, so landed views aren't dry flats */
@@ -267,20 +267,34 @@
     }
   };
 
+  S.takeT = -1;
   S.resetPlayer = function (world, W, H) {
     player.x = 120; player.vx = 0; player.vy = 0; player.on = 0; player.walk = 0; player.face = 1; player.idle = 0;
     S.landT = T.reduced ? 1 : 0;
-    S.camY = T.reduced ? 0 : (H * 0.95);
+    S.takeT = -1;
+    S.camY = T.reduced ? 0 : (H * 0.42);
     S.fx = [];
     S._py = null;
+  };
+  S.beginTakeoff = function (H) {
+    S.takeT = 0;
+    S.takeH = H;
+    player.vx = 0;
   };
 
   S.step = function (world, dt, keys, W, H) {
     var horizon = walkLine(H);
-    if (S.landT < 1) {
+    if (S.takeT >= 0 && S.takeT < 1) {
+      S.takeT = Math.min(1, S.takeT + dt / 1.65);
+      var te = S.takeT * S.takeT * (3 - 2 * S.takeT);
+      S.camY = (H * 0.55) * te;
+      var gyT = groundY(world, player.x, H, horizon) - 16;
+      S._py = gyT - te * H * 0.85;
+      player.on = 0;
+    } else if (S.landT < 1) {
       S.landT = Math.min(1, S.landT + dt / 2.35);
       var u = S.landT, e = 1 - Math.pow(1 - u, 2.2);
-      S.camY = (H * 0.95) * (1 - e);
+      S.camY = (H * 0.42) * (1 - e);
       if (u > 0.92 && S.camY < 2) S.camY = 0;
       var startY = horizon - H * 0.9, gy = groundY(world, player.x, H, horizon) - 16;
       var drop = T.clamp((u - 0.28) / 0.62, 0, 1);
@@ -292,7 +306,7 @@
         if (T.sfx && T.sfx.land) T.sfx.land();
       }
     } else {
-      S.camY *= 0.85;
+      S.camY *= Math.exp(-10 * dt);
       if (S.camY < 0.5) S.camY = 0;
       var ax = (keys.left ? -1 : 0) + (keys.right ? 1 : 0);
       if (ax) player.face = ax;
@@ -341,6 +355,7 @@
     var bob = player.on && !walk ? (((t * 2) | 0) % 2) : 0;
     if (walk) py += (frame === 1 || frame === 3) ? 1 : 0;
     py += bob;
+    px = Math.round(px); py = Math.round(py);
     var f = player.face < 0;
     function p(xx, yy, c) { ctx.fillStyle = c; ctx.fillRect(px + (f ? 15 - xx : xx), py + yy, 1, 1); }
     var skin = '#e8c89a', hair = '#3a2410', shirt = '#3a6a48', lite = '#5a8a60', pant = '#2a2a38', boot = '#2a1a10', ink = '#1a1008', pack = '#5a4030', blush = '#c08070';
@@ -587,13 +602,13 @@
       if (spec.clouds < 0.05 && biome !== 'storm') n = Math.max(2, (count * 0.35) | 0);
       for (ci = 0; ci < n; ci++) {
         spr = cloudSprite(ci + ((par * 10) | 0));
-        cx = ((T.hash(ci, 11 + par * 9, seed) * (W + spr.width + 80) + t * speed * (spec.clouds * 4 + 2) - camX * par) % (W + spr.width + 80) + (W + spr.width + 80)) % (W + spr.width + 80) - spr.width;
+        cx = ((T.hash(ci, 11 + par * 9, seed) * (W + spr.width + 80) + t * speed * (0.35 + spec.clouds * 0.45) - camX * par) % (W + spr.width + 80) + (W + spr.width + 80)) % (W + spr.width + 80) - spr.width;
         cy = y0 + T.hash(ci, 13 + par * 7, seed) * ySpan - camY * par;
         ctx.imageSmoothingEnabled = false;
         ctx.drawImage(spr, cx | 0, cy | 0);
       }
     }
-    drawCloudLayer(7, 0.10, 2, horizon * 0.14, 4);
+    drawCloudLayer(7, 0.10, 2, horizon * 0.14, 1.1);
 
     /* mountains: slope shading, ridgelines, snow/rock, atmospheric perspective */
     function asRgb(c) {
@@ -617,11 +632,12 @@
       }
       for (hx = 0; hx < W; hx++) {
         hh = hs[hx];
-        top = (yBase - hh - camY * par) | 0;
+        var bow = Math.pow((hx + 0.5) / W * 2 - 1, 2) * (H * (0.04 + haze * 0.22));
+        top = (yBase - hh - camY * par + bow) | 0;
         var slope = hh - (hx ? hs[hx - 1] : hh);
         var facing = sunRight ? (slope < -0.2) : (slope > 0.2);
         var ridge = hh >= (hx ? hs[hx - 1] : 0) && hh >= (hx < W - 1 ? hs[hx + 1] : 0) && hh > amp * 0.4;
-        var fillH = Math.max(1, (horizon + 4) - top);
+        var fillH = Math.max(1, (horizon + camY + 8) - top);
         if (top >= H) continue;
         var y2, rel, col;
         for (y2 = 0; y2 < fillH; y2++) {
@@ -652,7 +668,7 @@
     var farLit = mixRgb(farC[1] || farC[0], skyHaze, 0.2);
     var midLit = mixRgb(midC[1] || midC[0], skyHaze, 0.08);
     drawRange(0.10, horizon - 36, [mixRgb(farC[0], skyHaze, 0.42), farLit], 38, 0.014, 2, 0.62);
-    drawCloudLayer(5, 0.16, 2, Math.max(8, horizon * 0.16), 6);
+    drawCloudLayer(5, 0.16, 2, Math.max(8, horizon * 0.16), 1.6);
     drawRange(0.26, horizon - 18, [mixRgb(midC[0], skyHaze, 0.16), midLit], 26, 0.024, 5, 0.22);
 
     drawRange(0.48, horizon - 6, [midC[1] || grass[0], grass[1] || grass[0]], 14, 0.038, 9, 0.06);
@@ -683,14 +699,14 @@
     }
 
     /* a few mid-sky clouds, kept above the mountain line */
-    drawCloudLayer(4, 0.28, horizon * 0.10, horizon * 0.14, 8);
+    drawCloudLayer(4, 0.28, horizon * 0.10, horizon * 0.14, 2.1);
 
     /* water in valleys only, then a short clean ground / strata strip */
     img = ctx.getImageData(0, 0, W, H); d = img.data;
     var seaY = (horizon - (world.sea - RELIEF_BASE) + camY) | 0;
     var stripEnd = dirtBottom(H, horizon) + camY;
     var bed = Math.max(5, ((stripEnd - (horizon + camY)) / 4) | 0);
-    var wind = Math.sin(t * 2.1);
+    var wind = Math.sin(t * 0.7);
     for (x = 0; x < W; x++) {
       var wi = ((Math.floor(camX + x) % WORLD) + WORLD) % WORLD;
       var gh = world.h[wi], gy = (horizon - (gh - RELIEF_BASE) + camY) | 0, wet = gh <= world.sea + 0.5;
@@ -698,7 +714,7 @@
       if (wet) {
         var top = seaY, bot = Math.min(stripEnd, Math.max(floor, seaY + 1));
         var wx = camX + x, foamy = Math.sin(wx * 0.2 + t * 2.2) * 0.5 + 0.5;
-        var hh = 1 + ((Math.sin(wx * 0.35 + t * 3) + 1) * 0.8) | 0;
+        var hh = 1 + ((Math.sin(wx * 0.35 + t * 0.9) + 1) * 0.8) | 0;
         if (biome !== 'lava' && top - hh >= 0) {
           var foam = T.hex(foamy > 0.7 ? WATER[4] : WATER[1]);
           for (k = 0; k < hh; k++) put(d, W, H, x, top - hh + k, foam[0], foam[1], foam[2]);
@@ -706,7 +722,7 @@
         for (y = top; y < bot; y++) {
           var wv = (y - top) / Math.max(1, bot - top);
           var wii = Math.min(WATER.length - 1, (wv * (WATER.length - 1) + T.bayer(x, y) * 0.5) | 0);
-          var shimmer = Math.sin((camX + x) * 0.4 + t * 3 + y * 0.2);
+          var shimmer = Math.sin((camX + x) * 0.4 + t * 0.9 + y * 0.2);
           var wc;
           if (biome === 'lava') wc = T.bayer(x, y) < 0.4 ? T.hex('#c04010') : T.hex('#6a1808');
           else if (biome === 'ice') wc = T.bayer(x, y) < 0.5 ? T.hex('#b0d0e8') : T.hex(WATER[wii]);
@@ -732,11 +748,11 @@
           gc = [(gc[0] * 0.4 + pc[0] * 0.6) | 0, (gc[1] * 0.4 + pc[1] * 0.6) | 0, (gc[2] * 0.4 + pc[2] * 0.6) | 0];
         }
         for (y = gy; y < dirtStart && y < H; y++) put(d, W, H, x, y, gc[0], gc[1], gc[2]);
-        var sway = (!T.reduced && (biome !== 'ice' && biome !== 'desert')) ? ((wind + Math.sin(t * 2.4 + wi * 0.2)) > 0.3 ? 1 : 0) : 0;
+        var sway = (!T.reduced && (biome !== 'ice' && biome !== 'desert')) ? ((wind + Math.sin(t * 0.8 + wi * 0.2)) > 0.55 ? 1 : 0) : 0;
         if (biome === 'ice' || biome === 'tundra') {
           if (T.hash(wi, 8, seed) < 0.28) put(d, W, H, x, gy - 1, 255, 255, 255);
         } else if (biome === 'lava') {
-          if (T.hash(wi, 8, seed) < 0.14) { var lv = T.bayer(x, (t * 8) | 0) < 0.5 ? [255, 96, 24] : [192, 48, 16]; put(d, W, H, x, gy, lv[0], lv[1], lv[2]); }
+          if (T.hash(wi, 8, seed) < 0.14) { var lv = T.bayer(x, (t * 2) | 0) < 0.5 ? [255, 96, 24] : [192, 48, 16]; put(d, W, H, x, gy, lv[0], lv[1], lv[2]); }
         } else if (biome === 'desert') {
           if (T.hash(wi, 8, seed) < 0.18) put(d, W, H, x, gy, 224, 192, 112);
         } else {
@@ -813,19 +829,19 @@
 
     function blitAt(kind, worldX, footY, sc, flip) {
       var spr = sprite(kind), sx = wrapX(worldX, camX, W);
-      sc = sc || 2;
-      if (sx < -32 || sx > W + 32) return;
-      var dw = spr.width * sc, dh = spr.height * sc;
-      var dx = (sx - (dw / 2)) | 0, dy = (footY - dh) | 0;
+      /* always 1:1 with the surface canvas — never upscale a small sprite into chunky blocks */
+      if (sx < -40 || sx > W + 40) return;
+      var dw = spr.width, dh = spr.height;
+      var dx = Math.round(sx - dw / 2), dy = Math.round(footY - dh);
       ctx.imageSmoothingEnabled = false;
       if (flip) {
         ctx.save();
         ctx.translate(dx + dw, dy);
         ctx.scale(-1, 1);
-        ctx.drawImage(spr, 0, 0, spr.width, spr.height, 0, 0, dw, dh);
+        ctx.drawImage(spr, 0, 0);
         ctx.restore();
       } else {
-        ctx.drawImage(spr, 0, 0, spr.width, spr.height, dx, dy, dw, dh);
+        ctx.drawImage(spr, dx, dy);
       }
     }
     var items = world.decor.slice();
@@ -835,27 +851,27 @@
     for (i = 0; i < items.length; i++) {
       var it = items[i], ix = ((it.x % WORLD) + WORLD) % WORLD, iy = groundY(world, ix, H, horizon) + camY;
       if (world.h[ix | 0] <= world.sea + 0.5 && it.kind !== 'print') iy = horizon - (world.sea - RELIEF_BASE) + camY;
-      blitAt(it.kind, ix, iy, it.sc || 2, it.flip);
+      blitAt(it.kind, ix, iy, 1, it.flip);
     }
 
     /* ambient life, wind, critters, motes — SoT-level density */
     if (!T.reduced) {
       if (biome === 'garden' || biome === 'forest' || biome === 'ocean') {
         for (i = 0; i < 16; i++) {
-          var bx = wrapX((T.hash(i, 30, seed) * WORLD + t * (14 + i * 6)) % WORLD, camX, W);
-          var by = horizon * 0.22 + Math.sin(t * 1.6 + i) * 12 + T.hash(i, 31, seed) * 32 - camY * 0.3;
-          var wing = ((t * 10 + i) | 0) % 2;
+          var bx = wrapX((T.hash(i, 30, seed) * WORLD + t * (5 + i * 1.4)) % WORLD, camX, W);
+          var by = horizon * 0.22 + Math.sin(t * 0.55 + i) * 8 + T.hash(i, 31, seed) * 32 - camY * 0.3;
+          var wing = ((t * 4 + i) | 0) % 2;
           ctx.fillStyle = i % 4 === 0 ? '#c04060' : (i % 4 === 1 ? '#e0c040' : '#1a1a18');
           ctx.fillRect(bx | 0, by | 0, 3, 1);
           ctx.fillRect((bx | 0) + (wing ? 3 : -2), (by | 0) - 1, 2, 1);
         }
         /* dragonflies */
         for (i = 0; i < 4; i++) {
-          var dx2 = wrapX((T.hash(i, 55, seed) * WORLD + t * 22) % WORLD, camX, W);
-          var dy2 = horizon * 0.48 + Math.sin(t * 2.2 + i) * 6 - camY * 0.25;
+          var dx2 = wrapX((T.hash(i, 55, seed) * WORLD + t * 7) % WORLD, camX, W);
+          var dy2 = horizon * 0.48 + Math.sin(t * 0.7 + i) * 5 - camY * 0.25;
           ctx.fillStyle = '#4a6a80'; ctx.fillRect(dx2 | 0, dy2 | 0, 5, 1);
           ctx.fillStyle = '#c8e0f0';
-          var fl = ((t * 14 + i) | 0) % 2;
+          var fl = ((t * 5 + i) | 0) % 2;
           ctx.fillRect((dx2 | 0) + 1, (dy2 | 0) - 1 - fl, 2, 1);
           ctx.fillRect((dx2 | 0) + 1, (dy2 | 0) + 1 + fl, 2, 1);
         }
@@ -863,8 +879,8 @@
       if (biome === 'garden' || biome === 'forest') {
         for (i = 0; i < 36; i++) {
           var fx = wrapX((T.hash(i, 40, seed) * WORLD + Math.sin(t * 0.8 + i) * 10 + t * 8) % WORLD, camX, W);
-          var fy = horizon - 10 - T.hash(i, 41, seed) * 50 + Math.sin(t * 2 + i * 1.3) * 5 + camY;
-          if ((Math.sin(t * 5 + i * 2) + 1) * 0.5 > 0.22) {
+          var fy = horizon - 10 - T.hash(i, 41, seed) * 50 + Math.sin(t * 0.7 + i * 1.3) * 5 + camY;
+          if ((Math.sin(t * 1.6 + i * 2) + 1) * 0.5 > 0.22) {
             ctx.fillStyle = i % 4 === 0 ? '#fff8c0' : (i % 4 === 1 ? '#d8f080' : (i % 4 === 2 ? '#f0d0e0' : '#e8f8d0'));
             ctx.fillRect(fx | 0, fy | 0, 1, 1);
           }
@@ -873,19 +889,19 @@
       /* fish in water */
       if (biome !== 'lava') {
         for (i = 0; i < 8; i++) {
-          var fix = (T.hash(i, 73, seed) * WORLD + t * (8 + i)) % WORLD;
+          var fix = (T.hash(i, 73, seed) * WORLD + t * (2.4 + i * 0.25)) % WORLD;
           if (world.h[fix | 0] > world.sea + 0.5) continue;
-          var fsy = (horizon - (world.sea - RELIEF_BASE) + camY) + 2 + (i % 3) * 2 + Math.sin(t * 2 + i) * 1;
+          var fsy = (horizon - (world.sea - RELIEF_BASE) + camY) + 2 + (i % 3) * 2 + Math.sin(t * 0.7 + i) * 1;
           var fsx = wrapX(fix, camX, W);
           ctx.fillStyle = i % 2 ? '#2a6080' : '#48a0b8';
           ctx.fillRect(fsx | 0, fsy | 0, 4, 2);
-          ctx.fillRect((fsx + (((t * 6 + i) | 0) % 2 ? 4 : -1)) | 0, fsy | 0, 1, 1);
+          ctx.fillRect((fsx + (((t * 2 + i) | 0) % 2 ? 4 : -1)) | 0, fsy | 0, 1, 1);
         }
       }
       /* ground critters */
       if (biome !== 'lava') {
         for (i = 0; i < 8; i++) {
-          var cx2 = (T.hash(i, 88, seed) * WORLD + t * (8 + i * 3) * (i % 2 ? 1 : -1) + WORLD) % WORLD;
+          var cx2 = (T.hash(i, 88, seed) * WORLD + t * (2.5 + i * 0.8) * (i % 2 ? 1 : -1) + WORLD) % WORLD;
           if (world.h[cx2 | 0] <= world.sea + 0.5) continue;
           var cy2 = groundY(world, cx2, H, horizon) + camY - (i % 3 === 0 ? 3 : 2);
           var csx = wrapX(cx2, camX, W);
@@ -896,21 +912,21 @@
             ctx.fillRect((csx + 3) | 0, (cy2 - 2) | 0, 1, 2);
           } else {
             ctx.fillRect(csx | 0, cy2 | 0, 3, 2);
-            ctx.fillRect((csx + (((t * 8 + i) | 0) % 2)) | 0, (cy2 + 2) | 0, 1, 1);
+            ctx.fillRect((csx + (((t * 2.5 + i) | 0) % 2)) | 0, (cy2 + 2) | 0, 1, 1);
           }
         }
       }
       /* wind streaks + falling leaves / motes */
       for (i = 0; i < 10; i++) {
-        var wx2 = wrapX((T.hash(i, 66, seed) * WORLD + t * 40) % WORLD, camX, W);
+        var wx2 = wrapX((T.hash(i, 66, seed) * WORLD + t * 10) % WORLD, camX, W);
         var wy2 = 8 + T.hash(i, 67, seed) * (horizon * 0.55) - camY * 0.2;
         ctx.fillStyle = 'rgba(255,255,255,0.4)';
         ctx.fillRect(wx2 | 0, wy2 | 0, 5 + (i % 3), 1);
       }
       if (biome === 'garden' || biome === 'forest') {
         for (i = 0; i < 14; i++) {
-          var lx = wrapX((T.hash(i, 81, seed) * WORLD + t * (6 + i % 5) + Math.sin(t + i) * 8) % WORLD, camX, W);
-          var ly = ((T.hash(i, 82, seed) * horizon + t * (10 + i)) % (horizon + 8)) + camY * 0.2;
+          var lx = wrapX((T.hash(i, 81, seed) * WORLD + t * (1.8 + (i % 5) * 0.3) + Math.sin(t * 0.5 + i) * 8) % WORLD, camX, W);
+          var ly = ((T.hash(i, 82, seed) * horizon + t * (3 + i * 0.25)) % (horizon + 8)) + camY * 0.2;
           ctx.fillStyle = i % 2 ? '#3a8a34' : '#c05030';
           ctx.fillRect(lx | 0, ly | 0, 2, 1);
         }
@@ -918,15 +934,15 @@
       if (biome === 'lava') {
         for (i = 0; i < 20; i++) {
           var ex = wrapX((T.hash(i, 50, seed) * WORLD) % WORLD, camX, W);
-          var ey = (horizon * 0.35 + ((t * (16 + i) + T.hash(i, 51, seed) * 80) % (horizon * 0.55))) - camY * 0.2;
+          var ey = (horizon * 0.35 + ((t * (5 + i * 0.3) + T.hash(i, 51, seed) * 80) % (horizon * 0.55))) - camY * 0.2;
           ctx.fillStyle = i % 2 ? '#ff8018' : '#ffd040';
           ctx.fillRect(ex | 0, ey | 0, 1, 1);
         }
       }
       if (biome === 'ice' || biome === 'tundra') {
         for (i = 0; i < 24; i++) {
-          var snx = wrapX((T.hash(i, 60, seed) * WORLD + t * (12 + i % 5)) % WORLD, camX, W);
-          var sny = ((t * (18 + i % 7) + T.hash(i, 61, seed) * horizon) % horizon) + camY * 0.15;
+          var snx = wrapX((T.hash(i, 60, seed) * WORLD + t * (3.5 + (i % 5) * 0.4)) % WORLD, camX, W);
+          var sny = ((t * (5 + (i % 7) * 0.4) + T.hash(i, 61, seed) * horizon) % horizon) + camY * 0.15;
           ctx.fillStyle = '#f4f8fc'; ctx.fillRect(snx | 0, sny | 0, 1, 1);
         }
       }
@@ -962,14 +978,20 @@
         ctx.fillStyle = 'rgba(' + ac[0] + ',' + ac[1] + ',' + ac[2] + ',' + (veil * 0.75).toFixed(3) + ')';
         ctx.fillRect(0, 0, W, H);
       }
-      if (u < 0.7) {
-        for (i = 0; i < 14; i++) {
+      if (u < 0.72) {
+        var skyLim = Math.max(12, (horizon + camY) - 10);
+        var rushA = T.clamp((0.72 - u) / 0.72, 0, 1) * 0.55;
+        ctx.save();
+        ctx.globalAlpha = rushA;
+        ctx.imageSmoothingEnabled = false;
+        for (i = 0; i < 8; i++) {
           var csp = cloudSprite(i % 8);
-          var clx = ((T.hash(i, 3, seed) * W + t * (40 + i * 8) * (1.4 - u)) % (W + 80)) - 40;
-          var cly = ((t * (80 + i * 12) * (1.2 - u) + T.hash(i, 4, seed) * H) % (H + 40)) - 16;
-          ctx.imageSmoothingEnabled = false;
+          var clx = ((T.hash(i, 3, seed) * W + t * (18 + i * 3) * (1.3 - u)) % (W + 80)) - 40;
+          var cly = ((T.hash(i, 4, seed) * skyLim + t * (14 + i * 3) * (1.15 - u)) % skyLim) - 4;
+          if (cly > skyLim - 6) continue;
           ctx.drawImage(csp, clx | 0, cly | 0);
         }
+        ctx.restore();
       }
     }
   };

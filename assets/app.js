@@ -13,6 +13,8 @@
   var revealT = -1;
   var ZMIN = 0.12, ZMAX = 6;
   var hover = null, selected = null, keys = { left: 0, right: 0, jump: 0 };
+  var flyCam = { follow: null, gx: 0, gy: 0, gz: 1, easing: 0 };
+  var descend = null, ascent = null, fxCanvas = null;
   var world = null, tool = null, erase = false, painting = false;
   var launch = null, titleSpec, titlePlanet = 0;
   var orbitMap = null, orbitTrails = {}, hoverP = null;
@@ -37,28 +39,72 @@
     if (!motionOk()) { revealT = -1; return; }
     revealT = 0;
   }
+  function followZ(p) {
+    var k = 0.62 + ((p && p.size) || 0.5) * 0.5;
+    return T.clamp((Math.min(W, H) * 0.22) / (VIEW_R * k), 2.15, 4.2);
+  }
+  function fillZ(p) {
+    var k = 0.62 + ((p && p.size) || 0.5) * 0.5;
+    return T.clamp((Math.min(W, H) * 0.46) / (VIEW_R * k), 3.2, ZMAX);
+  }
+  function setCamGoal(x, y, z) {
+    flyCam.gx = x; flyCam.gy = y;
+    if (z != null) flyCam.gz = T.clamp(z, ZMIN, ZMAX);
+    flyCam.easing = 1;
+  }
+  function releaseFollow(zoomOut) {
+    flyCam.follow = null;
+    if (zoomOut) { flyCam.gz = Math.min(flyCam.gz, Math.max(0.7, cam.z * 0.45)); flyCam.easing = 1; }
+  }
+  function startFollow(p, z) {
+    if (!p) return;
+    flyCam.follow = p;
+    var pos = planetPos(p, time);
+    setCamGoal(pos.x, pos.y, z != null ? z : Math.max(cam.z, followZ(p)));
+    inertia.vx = inertia.vy = 0;
+    if (!motionOk()) { cam.x = flyCam.gx; cam.y = flyCam.gy; cam.z = flyCam.gz; }
+  }
   function camZoomAt(sx, sy, nz) {
     var z0 = cam.z, z1 = T.clamp(nz, ZMIN, ZMAX);
+    if (flyCam.follow) { flyCam.gz = z1; flyCam.easing = 1; if (!motionOk()) cam.z = z1; return; }
     var wx = cam.x + (sx - W / 2) / z0, wy = cam.y + (sy - H / 2) / z0;
-    cam.z = z1;
-    cam.x = wx - (sx - W / 2) / z1;
-    cam.y = wy - (sy - H / 2) / z1;
+    setCamGoal(wx - (sx - W / 2) / z1, wy - (sy - H / 2) / z1, z1);
+    if (!motionOk()) { cam.x = flyCam.gx; cam.y = flyCam.gy; cam.z = z1; }
   }
   function tickCam(dt) {
-    if (zoomAnim) {
-      zoomAnim.t += dt;
-      var u = Math.min(1, zoomAnim.t / zoomAnim.dur);
-      var e = 1 - Math.pow(1 - u, 3);
-      camZoomAt(zoomAnim.x, zoomAnim.y, zoomAnim.from + (zoomAnim.to - zoomAnim.from) * e);
-      if (u >= 1) zoomAnim = null;
+    if (flyCam.follow && (mode === 'system' || mode === 'inspect' || mode === 'descend' || mode === 'ascent')) {
+      var fp = flyCam.follow, fresh = planets.filter(function (x) { return x.id === fp.id || x === fp; })[0];
+      if (fresh) flyCam.follow = fresh;
+      var pos = planetPos(flyCam.follow, time);
+      flyCam.gx = pos.x; flyCam.gy = pos.y; flyCam.easing = 1;
     }
-    if (drag || pinch || pointers.size) return;
+    if (flyCam.easing && !drag && !pinch) {
+      var k = motionOk() ? (1 - Math.exp(-6.2 * dt)) : 1;
+      cam.x += (flyCam.gx - cam.x) * k;
+      cam.y += (flyCam.gy - cam.y) * k;
+      cam.z += (flyCam.gz - cam.z) * k;
+      if (Math.abs(cam.z - flyCam.gz) < 0.003 && Math.hypot(cam.x - flyCam.gx, cam.y - flyCam.gy) < 0.5) {
+        cam.x = flyCam.gx; cam.y = flyCam.gy; cam.z = flyCam.gz;
+        if (!flyCam.follow) flyCam.easing = 0;
+      }
+    }
+    if (drag || pinch || flyCam.follow || flyCam.easing) return;
     if (!motionOk()) { inertia.vx = inertia.vy = 0; return; }
     cam.x += inertia.vx * dt;
     cam.y += inertia.vy * dt;
     inertia.vx *= Math.exp(-3.6 * dt);
     inertia.vy *= Math.exp(-3.6 * dt);
     if (Math.hypot(inertia.vx, inertia.vy) < 0.02) inertia.vx = inertia.vy = 0;
+  }
+  function scratchFX(w, h) {
+    if (!fxCanvas || fxCanvas.width !== w || fxCanvas.height !== h) {
+      fxCanvas = document.createElement('canvas');
+      fxCanvas.width = w; fxCanvas.height = h;
+      fxCanvas.g = fxCanvas.getContext('2d');
+      T.setSmooth(fxCanvas.g, false);
+    }
+    fxCanvas.g.clearRect(0, 0, w, h);
+    return fxCanvas;
   }
 
   function resize() {
@@ -73,7 +119,7 @@
     T.setSmooth(ctx, false);
     document.documentElement.style.setProperty('--px', scale + 'px');
     if (T.ui && T.ui._sizeDust) T.ui._sizeDust();
-    if (mode === 'system') frameSystem();
+    if (mode === 'system' && !flyCam.follow) frameSystem();
   }
 
   /* ---------- music icon ---------- */
@@ -105,7 +151,7 @@
     var r = T.rng(0x5eed), n = 160, i;
     for (i = 0; i < n; i++) stars.push({ x: r(), y: r(), b: r() < 0.5 ? 0 : r() < 0.82 ? 1 : 2, ph: r() * TAU, band: r() < 0.22 });
   }
-  function drawStars() {
+  function drawStars(dt) {
     var i, s, x, y, c, tw;
     for (i = 0; i < stars.length; i++) {
       s = stars[i];
@@ -123,7 +169,7 @@
       }
     }
     if (!T.reduced && shoot) {
-      shoot.t -= 0.016;
+      shoot.t -= (dt || 1 / 60);
       if (shoot.t < 0) {
         var sx = ((shoot.x * W + (0.4 - shoot.t) * shoot.vx * W) % (W + 40));
         var sy = shoot.y * H + (0.4 - shoot.t) * shoot.vy * H;
@@ -388,13 +434,13 @@
     ['title-ui', 'builder', 'card'].forEach(function (id) { var el = $(id); if (el) el.classList.remove('fx-out'); });
     $('title-ui').hidden = next !== 'title';
     $('builder').hidden = next !== 'builder';
-    $('back-btn').hidden = next === 'title' || next === 'launch' || next === 'surface';
+    $('back-btn').hidden = next === 'title' || next === 'launch' || next === 'surface' || next === 'descend' || next === 'ascent';
     $('make-btn').hidden = next !== 'system' && next !== 'inspect';
     $('card').hidden = next !== 'inspect';
     $('surface-ui').hidden = next !== 'surface';
-    $('music-credit').hidden = next === 'builder' || next === 'surface';
+    $('music-credit').hidden = next === 'builder' || next === 'surface' || next === 'descend' || next === 'ascent' || next === 'boot';
     $('back-btn').textContent = next === 'builder' ? 'Back' : 'Title';
-    if (next === 'system') frameSystem();
+    if (next === 'system' && !flyCam.follow) frameSystem();
     say(next === 'title' ? 'Terra.' : next === 'builder' ? 'Make a planet.' : next === 'system' ? 'The shared solar system.' : '');
   }
   function showMode(next, instant) {
@@ -424,8 +470,8 @@
   }
   function openCard(p) {
     selected = p;
+    startFollow(p, Math.max(cam.z, followZ(p)));
     showMode('inspect');
-    cam.x = planetPos(p, time).x; cam.y = planetPos(p, time).y; cam.z = Math.max(cam.z, 2.2);
     $('c-title').firstChild.textContent = (p.name || 'Planet') + ' ';
     $('c-num').textContent = '#' + p.n;
     var d = new Date(p.ts);
@@ -488,13 +534,21 @@
     world = T.surface.makeWorld(p);
     T.surface.resetPlayer(world, W, H);
     T.surface._py = null;
-    if (instant) { T.surface.landT = 1; T.surface.player.on = 1; }
     tool = null;
-    showMode('surface');
     buildSurfaceTools();
     $('s-title').textContent = (p.name || 'Planet') + '  #' + p.n;
-    if (T.sfx) T.sfx.land();
-    say('Landed on ' + (p.name || 'a planet') + '.');
+    if (instant || !motionOk()) {
+      T.surface.landT = 1; T.surface.player.on = 1; T.surface.camY = 0;
+      showMode('surface', true);
+      if (T.sfx) T.sfx.land();
+      say('Landed on ' + (p.name || 'a planet') + '.');
+      return;
+    }
+    startFollow(p, Math.max(cam.z, followZ(p)));
+    descend = { t: 0, dur: 2.55, fromZ: cam.z, toZ: fillZ(p), blended: 0 };
+    T.surface.takeT = -1;
+    applyMode('descend');
+    say('Descending toward ' + (p.name || 'a planet') + '.');
   }
   function buildSurfaceTools() {
     var box = $('s-tools'); box.innerHTML = '';
@@ -582,9 +636,25 @@
   }
 
   function goBack() {
-    if (mode === 'surface') { showMode(selected ? 'inspect' : 'system'); if (T.sfx) T.sfx.close(); return; }
-    if (mode === 'inspect') { showMode('system'); selected = null; if (T.sfx) T.sfx.close(); return; }
-    if (mode === 'system' || mode === 'builder') { showMode('title'); if (T.sfx) T.sfx.close(); }
+    if (mode === 'descend' || mode === 'ascent') return;
+    if (mode === 'surface') {
+      if (!motionOk() || !selected) {
+        showMode(selected ? 'inspect' : 'system', true);
+        if (selected) startFollow(selected, followZ(selected));
+        else releaseFollow(false);
+        if (T.sfx) T.sfx.close();
+        return;
+      }
+      T.surface.beginTakeoff(H);
+      ascent = { t: 0, dur: 2.2, toZ: followZ(selected), fromZ: fillZ(selected) };
+      startFollow(selected, ascent.toZ);
+      cam.z = ascent.fromZ; flyCam.gz = ascent.fromZ;
+      applyMode('ascent');
+      if (T.sfx) T.sfx.takeoff && T.sfx.takeoff();
+      return;
+    }
+    if (mode === 'inspect') { releaseFollow(true); selected = null; showMode('system'); if (T.sfx) T.sfx.close(); return; }
+    if (mode === 'system' || mode === 'builder') { releaseFollow(false); showMode('title'); if (T.sfx) T.sfx.close(); }
   }
 
   /* ---------- frames ---------- */
@@ -684,7 +754,7 @@
     T.planet.draw(ctx, cx, cy + 6, Math.min(W, H) * 0.24, titleSpec, time, [-0.55, -0.4, 0.7], { live: true });
     if (!T.reduced) {
       for (i = 0; i < 5; i++) {
-        var wx = ((time * (5 + i) + i * 40) % (W + 40)) - 20, wy = H * 0.34 + i * 7 + Math.sin(time * 0.4 + i) * 3;
+        var wx = ((time * (1.15 + i * 0.2) + i * 40) % (W + 40)) - 20, wy = H * 0.34 + i * 7 + Math.sin(time * 0.25 + i) * 3;
         ctx.fillStyle = '#d8e0d8';
         for (y = 0; y < 3; y++) for (x = 0; x < 12; x++) if (T.fbm2(x * 0.3 + i, y, 4, 2) > 0.5) ctx.fillRect((wx + x) | 0, (wy + y) | 0, 1, 1);
       }
@@ -824,6 +894,87 @@
     var camX = playerCam();
     T.surface.draw(ctx, world, camX, W, H, time);
   }
+  function atmoTint() {
+    var b = (selected && selected.biome) || 'garden';
+    return T.hex(TINT[b] || '#88c090');
+  }
+  function drawRushClouds(u, t) {
+    var i, x, y, n = 16;
+    for (i = 0; i < n; i++) {
+      var sp = 90 + i * 18, w = 10 + (i % 5) * 3;
+      x = ((t * sp * (1.35 - u) + i * 47) % (W + 60)) - 30;
+      y = ((t * (50 + i * 10) * (1.2 - u) + i * 29) % (H + 30)) - 10;
+      ctx.fillStyle = 'rgba(244,234,212,' + (0.18 + (1 - u) * 0.35).toFixed(3) + ')';
+      ctx.fillRect(x | 0, y | 0, w, 1 + (i % 3));
+      ctx.fillRect((x + 2) | 0, (y + 2) | 0, w - 3, 1);
+    }
+  }
+  function blitSurface(alpha) {
+    var off = scratchFX(W, H);
+    T.surface.draw(off.g, world, playerCam(), W, H, time);
+    ctx.save();
+    ctx.imageSmoothingEnabled = false;
+    ctx.globalAlpha = T.clamp(alpha, 0, 1);
+    ctx.drawImage(off, 0, 0);
+    ctx.restore();
+  }
+  function drawDescend(dt) {
+    if (!descend) { drawSystem(); return; }
+    descend.t += dt;
+    var u = T.clamp(descend.t / descend.dur, 0, 1), e = u * u * (3 - 2 * u);
+    flyCam.gz = descend.fromZ + (descend.toZ - descend.fromZ) * e;
+    flyCam.easing = 1;
+    drawSystem();
+    var haze = T.clamp((u - 0.12) / 0.5, 0, 1);
+    if (haze > 0.02) {
+      var ac = atmoTint();
+      var grd = ctx.createRadialGradient(W / 2, H / 2, Math.max(4, 8 * (1 - u)), W / 2, H / 2, Math.min(W, H) * (0.35 + u * 0.7));
+      grd.addColorStop(0, 'rgba(' + ac[0] + ',' + ac[1] + ',' + ac[2] + ',' + (0.15 + haze * 0.45).toFixed(3) + ')');
+      grd.addColorStop(1, 'rgba(' + ac[0] + ',' + ac[1] + ',' + ac[2] + ',0)');
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, W, H);
+    }
+    if (u > 0.18 && u < 0.92 && motionOk()) drawRushClouds(u, time);
+    if (u > 0.4 && world) {
+      if (!descend.blended) { T.surface.landT = 0; T.surface.camY = H * 0.42; descend.blended = 1; }
+      T.surface.step(world, dt, { left: 0, right: 0, jump: 0 }, W, H);
+      blitSurface(T.clamp((u - 0.4) / 0.42, 0, 1) * T.clamp((u - 0.4) / 0.42, 0, 1) * (3 - 2 * T.clamp((u - 0.4) / 0.42, 0, 1)));
+    }
+    if (u >= 1) {
+      descend = null;
+      showMode('surface', true);
+      if (T.sfx) T.sfx.land();
+      say('Landed on ' + ((selected && selected.name) || 'a planet') + '.');
+    }
+  }
+  function drawAscent(dt) {
+    if (!ascent) { drawSystem(); return; }
+    ascent.t += dt;
+    var u = T.clamp(ascent.t / ascent.dur, 0, 1), e = u * u * (3 - 2 * u);
+    flyCam.gz = ascent.fromZ + (ascent.toZ - ascent.fromZ) * e;
+    flyCam.easing = 1;
+    if (world) T.surface.step(world, dt, { left: 0, right: 0, jump: 0 }, W, H);
+    var surfA = 1 - T.clamp((u - 0.15) / 0.5, 0, 1);
+    if (surfA > 0.02 && world) blitSurface(surfA);
+    else { ctx.fillStyle = '#120e0c'; ctx.fillRect(0, 0, W, H); drawStars(dt); }
+    if (u > 0.28) {
+      var sysA = T.clamp((u - 0.28) / 0.5, 0, 1);
+      var off = scratchFX(W, H);
+      /* drawSystem uses ctx — temporarily swap */
+      var old = ctx; ctx = off.g;
+      off.g.fillStyle = '#120e0c'; off.g.fillRect(0, 0, W, H);
+      drawStars(dt); drawSystem();
+      ctx = old;
+      ctx.save(); ctx.imageSmoothingEnabled = false; ctx.globalAlpha = sysA; ctx.drawImage(off, 0, 0); ctx.restore();
+    }
+    if (u >= 1) {
+      ascent = null;
+      T.surface.takeT = -1;
+      if (selected) { startFollow(selected, followZ(selected)); showMode('inspect', true); }
+      else { releaseFollow(true); showMode('system', true); }
+      if (T.sfx) T.sfx.close();
+    }
+  }
   function playerCam() {
     var x = T.surface.player.x - W / 2;
     return x;
@@ -901,15 +1052,17 @@
       revealT += dt / 0.42;
       if (revealT >= 1) revealT = -1;
     }
-    if (mode === 'system' || mode === 'inspect') tickCam(dt);
+    if (mode === 'system' || mode === 'inspect' || mode === 'descend' || mode === 'ascent') tickCam(dt);
     ctx.fillStyle = '#120e0c';
     ctx.fillRect(0, 0, W, H);
-    if (mode !== 'surface') drawStars();
+    if (mode !== 'surface') drawStars(dt);
     if (mode === 'boot') drawBoot(dt);
     else if (mode === 'title') drawTitle();
     else if (mode === 'builder') drawBuilder();
     else if (mode === 'launch') drawLaunch(dt);
     else if (mode === 'system' || mode === 'inspect') drawSystem();
+    else if (mode === 'descend') drawDescend(dt);
+    else if (mode === 'ascent') drawAscent(dt);
     else if (mode === 'surface') drawSurface(dt);
     requestAnimationFrame(loop);
   }
@@ -1031,7 +1184,7 @@
       showMode('builder');
     }
     $('btn-shape').addEventListener('click', startNewPlanet);
-    $('btn-visit').addEventListener('click', function () { if (T.sfx) T.sfx.open(); cam = { x: 0, y: 0, z: 1 }; inertia.vx = inertia.vy = 0; showMode('system'); });
+    $('btn-visit').addEventListener('click', function () { if (T.sfx) T.sfx.open(); flyCam.follow = null; flyCam.easing = 0; cam = { x: 0, y: 0, z: 1 }; flyCam.gx = 0; flyCam.gy = 0; flyCam.gz = 1; inertia.vx = inertia.vy = 0; showMode('system'); });
     $('make-btn').addEventListener('click', startNewPlanet);
     $('back-btn').addEventListener('click', goBack);
     $('tabs').addEventListener('click', function (e) { var b = e.target.closest('[data-tab]'); if (!b) return; setTab(b.getAttribute('data-tab')); if (T.sfx) T.sfx.click(); });
@@ -1133,9 +1286,14 @@
     function updatePinch() {
       if (!pinch || pointers.size < 2) return;
       var m = midPtrs(), nz = T.clamp(pinch.z * (m.d / pinch.dist), ZMIN, ZMAX);
-      cam.z = nz;
-      cam.x = pinch.wx - (m.x - W / 2) / nz;
-      cam.y = pinch.wy - (m.y - H / 2) / nz;
+      if (flyCam.follow) {
+        flyCam.gz = nz; cam.z = nz;
+      } else {
+        cam.z = nz;
+        cam.x = pinch.wx - (m.x - W / 2) / nz;
+        cam.y = pinch.wy - (m.y - H / 2) / nz;
+        flyCam.gx = cam.x; flyCam.gy = cam.y; flyCam.gz = nz; flyCam.easing = 0;
+      }
       suppressClickUntil = performance.now() + 420;
     }
     canvas.addEventListener('pointerdown', function (e) {
@@ -1176,7 +1334,10 @@
         var stepX = (p.x - drag.lx) / cam.z, stepY = (p.y - drag.ly) / cam.z;
         inertia.vx = -stepX * 55; inertia.vy = -stepY * 55;
         drag.lx = p.x; drag.ly = p.y;
-        if (Math.hypot(p.x - drag.x, p.y - drag.y) > 5) drag.moved = 1;
+        if (Math.hypot(p.x - drag.x, p.y - drag.y) > 5) {
+          drag.moved = 1;
+          if (flyCam.follow) { flyCam.follow = null; flyCam.easing = 0; }
+        }
       }
       if (mode === 'system' && pointers.size < 2 && !pinch) {
         var hit = hitPlanet(p.x, p.y);
@@ -1213,8 +1374,7 @@
             if (tapTimer) { clearTimeout(tapTimer); tapTimer = null; }
             lastTap = 0;
             var target = cam.z < 2.2 ? Math.min(ZMAX, cam.z * 2) : Math.max(ZMIN, cam.z * 0.5);
-            if (motionOk()) zoomAnim = { x: p.x, y: p.y, from: cam.z, to: target, t: 0, dur: 0.26 };
-            else camZoomAt(p.x, p.y, target);
+            camZoomAt(p.x, p.y, target);
             suppressClickUntil = now + 400;
           } else {
             lastTap = now; lastTapX = p.x; lastTapY = p.y;
@@ -1238,7 +1398,8 @@
       if (mode !== 'system' && mode !== 'inspect') return;
       e.preventDefault();
       var p = canvasPos(e);
-      camZoomAt(p.x, p.y, cam.z * (e.deltaY > 0 ? 0.9 : 1.11));
+      var z0 = flyCam.easing || flyCam.follow ? flyCam.gz : cam.z;
+      camZoomAt(p.x, p.y, z0 * (e.deltaY > 0 ? 0.9 : 1.11));
     }, { passive: false });
     canvas.addEventListener('touchstart', function (e) {
       if (mode === 'system' || mode === 'inspect') e.preventDefault();
@@ -1272,7 +1433,10 @@
       setTab: setTab,
       frameSystem: frameSystem,
       get cam() { return cam; },
-      zoomAt: camZoomAt
+      zoomAt: camZoomAt,
+      get follow() { return flyCam.follow; },
+      startFollow: startFollow,
+      get descend() { return descend; }
     };
     setInterval(function () { if (mode === 'system' || mode === 'inspect') loadPlanets(); }, 20000);
   }
